@@ -1,7 +1,9 @@
 numpy
+torch
 transformers
 datasets
 tiktoken
 wandb
 tqdm
 matplotlib
+
