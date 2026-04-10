@@ -63,3 +63,7 @@ class GPTConfiguration:
             self.compile = True
         else:
             self.compile = False
+
+    # TODO:
+    #   - function write to file
+    #   - filename in class
