@@ -19,18 +19,19 @@ else:
 
 @dataclass
 class GPTConfiguration:
-    device: str = device
-    compile: bool = compile
     n_layer: int = 6
     n_head: int = 6
     n_embed: int = 384
+    device: str = device
+    compile: bool = compile
+    name: str = "baseline"
 
     def __str__(
             self
     ) -> str:
         longstr = f"""
             # Baseline configuration
-            out_dir = 'out-shakespeare-baseline'
+            out_dir = 'out-shakespeare-{self.name}'
             eval_interval = 250
             eval_iters = 200
             log_interval = 10
