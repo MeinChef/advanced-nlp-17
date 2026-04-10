@@ -4,30 +4,17 @@ from dataclasses import dataclass
 from textwrap import dedent
 
 
-
-if torch.cuda.is_available:
-    device = "cuda"
-elif torch.mps.is_available:
-    device = "mps"
-else:
-    device = "cpu"
-
-if platform.system() == "Linux" and torch.cuda.is_available():
-    compile = True
-else:
-    compile = False
-
 @dataclass
 class GPTConfiguration:
     n_layer: int = 6
     n_head: int = 6
     n_embed: int = 384
-    device: str = device
-    compile: bool = compile
+    device: str = "cpu"
+    compile: bool = False
     name: str = "baseline"
 
     def __str__(
-            self
+        self
     ) -> str:
         longstr = f"""
             # Baseline configuration
@@ -58,3 +45,21 @@ class GPTConfiguration:
             compile = {self.compile} # set True only on Linux with GPU
         """
         return dedent(longstr)
+    
+    def set_backend(
+        self
+    ) -> None:
+        if torch.cuda.is_available:
+            self.device = "cuda"
+        elif torch.mps.is_available:
+            self.device = "mps"
+        else:
+            self.device = "cpu"
+
+    def set_compile(
+        self
+    ) -> None:
+        if platform.system() == "Linux" and self.device == "cuda":
+            self.compile = True
+        else:
+            self.compile = False
