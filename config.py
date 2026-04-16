@@ -2,6 +2,7 @@ import torch
 import platform
 from dataclasses import dataclass
 from textwrap import dedent
+import os
 
 
 @dataclass
@@ -36,12 +37,12 @@ class GPTConfiguration:
             dropout = 0.2
             learning_rate = 1e-3
             max_iters = 5000
-            lr_decay_iters = 5000
+            lr_decay_iters = 100
             min_lr = 1e-4
             beta2 = 0.99
-            warmup_iters = 100
+            warmup_iters = 10
             weight_decay = 1e-1
-            device = {self.device} # change to 'cuda' if you have a GPU
+            device = \"{self.device}\" # change to 'cuda' if you have a GPU
             compile = {self.compile} # set True only on Linux with GPU
         """
         return dedent(longstr)
@@ -63,6 +64,19 @@ class GPTConfiguration:
             self.compile = True
         else:
             self.compile = False
+
+    def write(
+        self,
+        basepath: str = os.path.dirname(__file__)
+    ) -> None:
+        fullpath = os.path.join( 
+            basepath,
+            "config",
+            f"train-shakespeare-char-{self.name}.py"
+        )
+
+        with open(fullpath, "w") as f:
+            f.write(str(self))
 
     # TODO:
     #   - function write to file
