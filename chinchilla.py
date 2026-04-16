@@ -16,6 +16,10 @@ if __name__ == "__main__":
         name = "trials"
     )
 
+    config1.write(
+        basepath = nanoGPTpath
+    )
+
     # this overrides the values you passed earlier, if you passed any
     # config1.set_backend()
     # config1.set_compile()
@@ -29,7 +33,7 @@ if __name__ == "__main__":
             os.path.join(
                 nanoGPTpath,
                 "config",
-                f"train_shakespeare_char_{config1.name}.py"
+                f"train-shakespeare-char-{config1.name}.py"
             )
         ],
         cwd = nanoGPTpath,
