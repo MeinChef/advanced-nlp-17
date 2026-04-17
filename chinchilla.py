@@ -13,6 +13,10 @@ if __name__ == "__main__":
         n_head = 2,
         n_layer = 2,
         n_embed = 128,
+        max_iters = 100,
+        eval_iters = 20,
+        eval_interval = 50,
+        save_checkpoints = True,
         name = "trials"
     )
 
@@ -37,5 +41,5 @@ if __name__ == "__main__":
             )
         ],
         cwd = nanoGPTpath,
-        check=True
+        check = True
     )
