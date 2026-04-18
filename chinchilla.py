@@ -1,6 +1,7 @@
 from config import GPTConfiguration
 import subprocess
 import os
+import sys
 
 
 if __name__ == "__main__":
@@ -31,7 +32,7 @@ if __name__ == "__main__":
 
     subprocess.run(
         [
-            "python",
+            sys.executable,
             "-m",
             "train",
             os.path.join(
@@ -43,3 +44,29 @@ if __name__ == "__main__":
         cwd = nanoGPTpath,
         check = True
     )
+
+
+    with open(
+        os.path.join(
+            nanoGPTpath,
+            f"out-shakespeare-{config1.name}",
+            "samples"
+        ),
+        "w+"                                        # creates file if it doesn't exist
+    ) as file:
+        
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "sample",
+                f"--out_dir=out-shakespeare-{config1.name}",
+                f"--num_samples={config1.eval_samples}",
+                f"--device={config1.device}"
+            ],
+            cwd = nanoGPTpath,
+            text = True,
+            encoding = "utf-8",
+            stdout = file,
+            check = True
+        )
