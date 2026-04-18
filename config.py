@@ -17,6 +17,7 @@ class GPTConfiguration:
     max_iters: int = 5000
     warmup_iters: int = 200
     save_checkpoints: bool = False
+    init_from: str = "scratch"
     device: str = "cpu"
     compile: bool = False
     name: str = "baseline"
@@ -31,6 +32,7 @@ class GPTConfiguration:
             eval_iters = {self.eval_iters}
             log_interval = 10
             always_save_checkpoint = {self.save_checkpoints}
+            init_from = {self.init_from}
             wandb_log = False
             wandb_project = 'nanoGPT-assignment'
             wandb_run_name = 'baseline'
@@ -49,8 +51,8 @@ class GPTConfiguration:
             beta2 = 0.99
             warmup_iters = {self.warmup_iters}
             weight_decay = 1e-1
-            device = \"{self.device}\" # change to 'cuda' if you have a GPU
-            compile = {self.compile} # set True only on Linux with GPU
+            device = '{self.device}'
+            compile = {self.compile} 
         """
         return dedent(longstr)
     
