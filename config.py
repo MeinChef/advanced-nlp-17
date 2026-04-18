@@ -12,6 +12,7 @@ class GPTConfiguration:
     n_embed: int = 384
     eval_iters: int = 200
     eval_interval: int = 250
+    eval_samples: int = 5
     batch_size: int = 64
     max_iters: int = 5000
     warmup_iters: int = 200
