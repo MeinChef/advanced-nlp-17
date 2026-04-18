@@ -14,6 +14,7 @@ def prep_data_subs(
             f"Actual Value: {split}"
         )
 
+    # load
     data = np.memmap(
         os.path.join(
             base_path,
@@ -24,12 +25,13 @@ def prep_data_subs(
         mode = "r"
     )
 
+    # subset and save
     data_subset = data[:int(len(data) * split)]
     data_subset.tofile(
         os.path.join(
             base_path,
             "data",
-            f"train-{split}.bin"
+            f"train-{int(split * 100)}.bin"
         )
     )
 
@@ -60,28 +62,48 @@ if __name__ == "__main__":
     # config1.set_backend()
     # config1.set_compile()
 
-
-    subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "train",
-            os.path.join(
-                nanoGPTpath,
-                "config",
-                f"train-shakespeare-char-{config1.name}.py"
-            )
-        ],
-        cwd = nanoGPTpath,
-        check = True
+    current_outpath = os.path.join(
+        os.path.dirname(__file__),
+        f"out-shakespeare-{config1.name}"
+    )
+    
+    os.makedirs(
+        current_outpath,
+        exist_ok = True,
     )
 
-
+    # training
     with open(
         os.path.join(
-            nanoGPTpath,
-            f"out-shakespeare-{config1.name}",
-            "samples"
+            current_outpath,
+            "train.log"
+        ),
+        "w+"
+    ) as log:
+        
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "train",
+                os.path.join(
+                    nanoGPTpath,
+                    "config",
+                    f"train-shakespeare-char-{config1.name}.py"
+                )
+            ],
+            cwd = nanoGPTpath,
+            text = True,
+            encoding = "utf-8",
+            stdout = log,
+            check = True
+        )
+
+    # sampling (generating outputs)
+    with open(
+        os.path.join(
+            current_outpath,
+            "samples.log"
         ),
         "w+"                                        # creates file if it doesn't exist
     ) as file:
