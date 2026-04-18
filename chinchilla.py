@@ -2,6 +2,37 @@ from config import GPTConfiguration
 import subprocess
 import os
 import sys
+import numpy as np
+
+def prep_data_subs(
+    base_path: str = "nanoGPT",
+    split: float = 0.5,
+) -> None:
+    if split < 0 or split > 1:
+        raise ValueError(
+            "Split is outside of range 0-1. Please fix that.\n" +
+            f"Actual Value: {split}"
+        )
+
+    data = np.memmap(
+        os.path.join(
+            base_path,
+            "data",
+            "train.bin"
+        ), 
+        dtype = np.uint16, 
+        mode = "r"
+    )
+
+    data_subset = data[:int(len(data) * split)]
+    data_subset.tofile(
+        os.path.join(
+            base_path,
+            "data",
+            f"train-{split}.bin"
+        )
+    )
+
 
 
 if __name__ == "__main__":
