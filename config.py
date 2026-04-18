@@ -32,7 +32,7 @@ class GPTConfiguration:
             eval_iters = {self.eval_iters}
             log_interval = 10
             always_save_checkpoint = {self.save_checkpoints}
-            init_from = {self.init_from}
+            init_from = '{self.init_from}'
             wandb_log = False
             wandb_project = 'nanoGPT-assignment'
             wandb_run_name = 'baseline'
