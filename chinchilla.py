@@ -16,7 +16,16 @@ def prep_data_subs(
             f"Actual Value: {split}"
         )
 
-    # TODO: check if subset already exists
+    # check if subset already exists
+    if os.path.exists(
+        os.path.join(
+            base_path,
+            "data",
+            f"train-{int(split * 100)}.bin"
+        )
+    ):
+        print(f"A split of {split} already exists, not creating another one.")
+        return
 
     # load
     data = np.memmap(
