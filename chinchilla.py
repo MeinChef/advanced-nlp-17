@@ -3,6 +3,7 @@ from itertools import product
 import subprocess
 import os
 import sys
+import shutil
 import numpy as np
 
 def prep_data_subs(
@@ -22,7 +23,7 @@ def prep_data_subs(
         os.path.join(
             base_path,
             "data",
-            "train.bin"
+            "train-orig.bin"
         ), 
         dtype = np.uint16, 
         mode = "r"
@@ -35,6 +36,40 @@ def prep_data_subs(
             base_path,
             "data",
             f"train-{int(split * 100)}.bin"
+        )
+    )
+
+
+def use_subset(
+    basepath: str,
+    split: float | int = 0.5
+) -> None:
+    
+    # check if split is in a valid range
+    if split > 0 and split <= 1:
+        id = int(split * 100)
+    elif split > 0 and split <= 100 and isinstance(split, int):
+        id = split
+    else:
+        raise ValueError("Split is not in range ]0,1] or ]0,100] (and int).")
+
+    if os.path.exists(
+        os.path.join(basepath, "train.bin")
+    ):
+        # remove the train.bin first
+        os.remove(
+            os.path.join(basepath, "train.bin")
+        )
+
+    # aaaand copy
+    shutil.copyfile(
+        src = os.path.join(
+            basepath,
+            f"train-{id}.bin"
+        ),
+        dst = os.path.join(
+            basepath,
+            "train.bin"
         )
     )
 
@@ -54,15 +89,18 @@ if __name__ == "__main__":
     ]
 
     data_subsets = [0.125, 0.25, 0.5, 1]
-    # TODO: create subsets, delete train.bin, and copy the needed subset to train.bin
 
     for model_config, data_subset in product(model_configs, data_subsets):
         
+        # TODO: make max_iters depend on dataset size, such that model sees fixed number of tokens for each ds
+        # as per my understanding, we just have to keep that constant across all models
+        # should we take model size in account here?
+
         cfg = GPTConfiguration(
             n_head = model_config["heads"],
             n_layer = model_config["layers"],
             n_embed = model_config["embed"],
-            max_iters = 5,                        # TODO: make this depend on dataset size, such that model sees fixed number of tokens for each ds
+            max_iters = 5,
             eval_iters = 20,
             eval_interval = 5,
             save_checkpoints = True,
@@ -86,6 +124,16 @@ if __name__ == "__main__":
         os.makedirs(
             current_outpath,
             exist_ok = True,
+        )
+
+        # move the split we want to use to train.bin
+        use_subset(
+            basepath = os.path.join(
+                nanoGPTpath,
+                "data",
+                "shakespeare_char"
+            ),
+            split = data_subset
         )
 
 
