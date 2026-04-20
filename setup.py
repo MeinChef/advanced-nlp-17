@@ -2,6 +2,7 @@ import subprocess
 import os
 import sys
 import re
+import shutil
 
 def in_conda() -> bool:
     return bool(
@@ -55,17 +56,31 @@ if __name__ == "__main__":
     )
     print("Done!")
 
+    datapath =  os.path.join(
+        os.path.dirname(__file__),
+        "nanoGPT",
+        "data",
+        "shakespeare_char"
+    )
+
     if not os.path.exists(
         os.path.join(
-            os.path.dirname(__file__),
-            "nanoGPT",
-            "data",
-            "shakespeare_char",
+            datapath,
             "train.bin"
         )
     ):
         print("Generating train and test data...")
         import nanoGPT.data.shakespeare_char.prepare
+        shutil.copyfile(
+            src = os.path.join(
+                datapath,
+                "train.bin"
+            ),
+            dst = os.path.join(
+                datapath,
+                "train-orig.bin"
+            )
+        )
         print("Done!")
 
     else:
