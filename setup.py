@@ -1,6 +1,7 @@
 import subprocess
 import os
 import sys
+import re
 
 def in_conda() -> bool:
     return bool(
@@ -69,5 +70,39 @@ if __name__ == "__main__":
 
     else:
         print("Train and test data already prepared, skipping...")
+
+    print("Editing nanoGPT/model.py to report exact model parameters...")
+    if os.path.exists(
+        os.path.join(
+            os.path.dirname(__file__),
+            "nanoGPT",
+            "model.py"
+        )
+    ):
+        filepth = os.path.join(
+            os.path.dirname(__file__),
+            "nanoGPT",
+            "model.py"
+        )
+
+        replacement = "        print(\"number of parameters:\", self.get_num_params(non_embedding=False))"
+
+
+        with open(filepth, "r") as file:
+            data = file.readlines()
+        
+        if "number of parameters:" in data[147]:
+            data[147] = replacement
+        else: 
+            for n, line in enumerate(data):
+                if re.search("number of parameters:", line):
+                    data[n] = replacement
+
+        with open(filepth, "w") as file:
+            file.writelines(data)
+
+        print("Succesfully edited model.py!")
+    else:
+        print("Could not find model.py. Skipping ...")
 
     print("Setup complete!")
