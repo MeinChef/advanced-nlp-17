@@ -144,7 +144,7 @@ if __name__ == "__main__":
             "model.py"
         )
 
-        replacement = "        print(\"number of parameters:\", self.get_num_params(non_embedding=False))"
+        replacement = "        print(\"number of parameters:\", self.get_num_params(non_embedding=False))\n"
 
 
         with open(filepth, "r") as file:

@@ -122,13 +122,13 @@ if __name__ == "__main__":
             n_embed = model_config["embed"],
             max_iters = max_iters,
             eval_iters = 5,
-            eval_interval = min(max_iters/ 5 ,250),
+            eval_interval = 50,
             save_checkpoints = True,
             name = f"{model_config['layers']}-{model_config['embed']}-{data_subset}"
         )
 
         # this overrides the values you passed earlier, if you passed any
-        # config1.set_backend()
+        cfg.set_backend()
         # config1.set_compile()
 
 
