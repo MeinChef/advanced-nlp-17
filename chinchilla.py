@@ -94,10 +94,10 @@ if __name__ == "__main__":
     )
 
     model_configs = [
-        {"layers": 2, "heads": 2, "embed": 64},
-        {"layers": 4, "heads": 4, "embed": 128},
-        {"layers": 5, "heads": 5, "embed": 256},
-        {"layers": 6, "heads": 6, "embed": 512},
+        {"layers": 2, "heads": 2, "embed": 64*2, "params":   119168}, #    119.168
+        {"layers": 4, "heads": 4, "embed": 64*4, "params":  3230208}, #  3.230.208
+        {"layers": 5, "heads": 5, "embed": 64*5, "params":  6250240}, #  6.250.240
+        {"layers": 6, "heads": 6, "embed": 64*6, "params": 10745088}, # 10.745.088
     ]
 
     data_subsets = [0.125, 0.25, 0.5, 1]
@@ -110,13 +110,19 @@ if __name__ == "__main__":
         # as per my understanding, we just have to keep that constant across all models
         # should we take model size in account here?
 
+        # block size is context size
+        # ergo the network "sees" batch_size x block_size tokens per batch.
+        # which is 64*256 = 16384
+        max_iters = np.ceil(model_config["params"] / 16384 * 20)
+
+
         cfg = GPTConfiguration(
             n_head = model_config["heads"],
             n_layer = model_config["layers"],
             n_embed = model_config["embed"],
-            max_iters = 5,
-            eval_iters = 20,
-            eval_interval = 5,
+            max_iters = max_iters,
+            eval_iters = 5,
+            eval_interval = min(max_iters/ 5 ,250),
             save_checkpoints = True,
             name = f"{model_config['layers']}-{model_config['embed']}-{data_subset}"
         )
