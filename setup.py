@@ -30,6 +30,7 @@ if __name__ == "__main__":
     else:
         print("No conda environment detected. Aborting...")
         raise EnvironmentError()
+    
     print("Starting Setup...")
     if not os.path.exists(
         os.path.join(
@@ -43,7 +44,8 @@ if __name__ == "__main__":
                 "git",
                 "clone",
                 "https://github.com/karpathy/nanoGPT.git"
-            ]
+            ],
+            cwd = os.path.dirname(__file__)
         )
 
         print("Done!")
@@ -51,6 +53,8 @@ if __name__ == "__main__":
     else:
         print("NanoGPT repository already cloned or folder exists. Skipping...")
 
+    # Dummy variable for init reasons
+    blackwell = False
     print("Installing dependencies...")
     if ask_user_for_confirmation("Blackwell GPU? (y/n): "):
         subprocess.check_call(
@@ -66,19 +70,20 @@ if __name__ == "__main__":
                 )
             ]
         )
-        subprocess.check_call(
-            [
-                sys.executable,
-                "-m",
-                "pip",
-                "install",
-                "torch",
-                "torchvision",
-                "torchaudio",
-                "--index-url",
-                "https://download.pytorch.org/whl/cu129",
-            ]
-        )
+        blackwell = True
+        # subprocess.check_call(
+        #     [
+        #         sys.executable,
+        #         "-m",
+        #         "pip",
+        #         "install",
+        #         "torch",
+        #         "torchvision",
+        #         "torchaudio",
+        #         "--index-url",
+        #         "https://download.pytorch.org/whl/cu129",
+        #     ]
+        # )
     else:
         subprocess.check_call(
             [
@@ -158,5 +163,8 @@ if __name__ == "__main__":
         print("Succesfully edited model.py!")
     else:
         print("Could not find model.py. Skipping ...")
+
+    print("Torch installation for Blackwell-series GPUs not possoble in script, please refer to: [link to documentation].")
+    print("Probably like this: 'pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu129'")
 
     print("Setup complete!")
