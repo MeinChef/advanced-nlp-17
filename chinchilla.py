@@ -118,7 +118,7 @@ if __name__ == "__main__":
             eval_iters = 20,
             eval_interval = 5,
             save_checkpoints = True,
-            name = f"{model_config["layers"]}-{model_config["embed"]}-{data_subset}"
+            name = f"{model_config['layers']}-{model_config['embed']}-{data_subset}"
         )
 
         # this overrides the values you passed earlier, if you passed any
