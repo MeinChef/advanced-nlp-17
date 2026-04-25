@@ -15,10 +15,7 @@ def ask_user_for_confirmation(prompt: str) -> bool:
             print("Invalid input. please use only 'y' or 'n'.")
 
 def in_conda() -> bool:
-    return bool(
-            os.environ.get("CONDA_DEFAULT_ENV") or 
-            os.environ.get("CONDA_PREFIX")
-        )   
+    return "conda" in sys.executable
 
 def in_venv() -> bool:
     # Prüfen, ob das Skript in einer virtuellen Umgebung läuft
