@@ -17,7 +17,15 @@ conda create -n advnlp python=3.12
 conda activate advnlp
 ```
 
+```bash
+pytorch for cuda if you want to use a Blackwell gen card
+-> use requirements_blackwell.txt
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu129
+```
+
 Execute setup script
 ```bash
-python setup.py
+python setup_venv.py
+or
+python setup_conda.py
 ```
