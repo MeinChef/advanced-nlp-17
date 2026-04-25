@@ -128,8 +128,8 @@ if __name__ == "__main__":
         )
 
         # this overrides the values you passed earlier, if you passed any
-        # config1.set_backend()
-        # config1.set_compile()
+        cfg.set_backend()
+        # cfg.set_compile()
 
 
         cfg.write(
