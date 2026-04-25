@@ -71,13 +71,17 @@ if __name__ == "__main__":
         )
         subprocess.check_call(
             [
-                sys.executable, 
-                "-m", 
-                "pip", 
-                "install", 
-                "torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu129",
+                sys.executable,
+                "-m",
+                "pip",
+                "install",
+                "torch",
+                "torchvision",
+                "torchaudio",
+                "--index-url",
+                "https://download.pytorch.org/whl/cu129",
             ]
-        )    
+        )
     else:
         subprocess.check_call(
             [
