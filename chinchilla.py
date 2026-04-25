@@ -138,6 +138,7 @@ if __name__ == "__main__":
 
         current_outpath = os.path.join(
             os.path.dirname(__file__),
+            "logs",
             f"out-shakespeare-{cfg.name}"
         )
         
@@ -165,7 +166,7 @@ if __name__ == "__main__":
         with open(
             os.path.join(
                 current_outpath,
-                "train.log"
+                "train.out"
             ),
             "w+"
         ) as log:
@@ -197,7 +198,7 @@ if __name__ == "__main__":
         with open(
             os.path.join(
                 current_outpath,
-                "samples.log"
+                "samples.out"
             ),
             "w+"                                        # creates file if it doesn't exist
         ) as file:
