@@ -164,7 +164,8 @@ if __name__ == "__main__":
     else:
         print("Could not find model.py. Skipping ...")
 
-    print("Torch installation for Blackwell-series GPUs not possoble in script, please refer to: [link to documentation].")
-    print("Probably like this: 'pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu129'")
+    if blackwell:
+        print("Torch installation for Blackwell-series GPUs not possoble in script, please refer to: [link to documentation].")
+        print("Probably like this: 'pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu129'")
 
     print("Setup complete!")
