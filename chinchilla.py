@@ -21,6 +21,7 @@ def prep_data_subs(
         os.path.join(
             base_path,
             "data",
+            "shakespeare_char",
             f"train-{int(split * 100)}.bin"
         )
     ):
@@ -32,6 +33,7 @@ def prep_data_subs(
         os.path.join(
             base_path,
             "data",
+            "shakespeare_char",
             "train-orig.bin"
         ), 
         dtype = np.uint16, 
@@ -44,6 +46,7 @@ def prep_data_subs(
         os.path.join(
             base_path,
             "data",
+            "shakespeare_char",
             f"train-{int(split * 100)}.bin"
         )
     )
@@ -98,6 +101,8 @@ if __name__ == "__main__":
     ]
 
     data_subsets = [0.125, 0.25, 0.5, 1]
+    for split in data_subsets:
+        prep_data_subs(split = split)
 
     for model_config, data_subset in product(model_configs, data_subsets):
         
