@@ -8,6 +8,10 @@ Recommended models (downloaded automatically on first run):
   • Qwen/Qwen2.5-0.5B-Instruct   (~1 GB, fastest, slightly less accurate)
   • microsoft/phi-2               (~5 GB, strong on English literary text)
 
+  NOTE: Phi-2 is a base completion model — it has no chat template.
+  This script detects that automatically and falls back to a plain
+  Instruct-style prompt so it works out of the box.
+
 Install dependencies:
   pip install transformers torch accelerate
 """
@@ -24,7 +28,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
 # ── Configuration ────────────────────────────────────────────────────────────
 
-MODEL_ID = "Qwen/Qwen2.5-1.5B-Instruct"   # ← swap to any chat model you prefer
+MODEL_ID = "microsoft/phi-2"   # ← swap to any chat model you prefer
 
 # Use float16 on GPU, float32 on CPU (float16 on CPU causes errors on some HW)
 TORCH_DTYPE = torch.float16 if torch.cuda.is_available() else torch.float32
@@ -75,6 +79,18 @@ def _build_messages(text: str) -> list[dict]:
     ]
 
 
+def _build_plain_prompt(text: str) -> str:
+    """
+    Fallback prompt for base models (e.g. Phi-2) that have no chat template.
+    Uses an Instruct-style format that completion models respond well to.
+    """
+    return (
+        f"Instruct: {SYSTEM_PROMPT}\n\n"
+        f"Classify the following text:\n\n{text.strip()}\n\n"
+        f"Output:"
+    )
+
+
 def _parse_label(raw: str) -> Label:
     token = raw.strip().lower().split()[0] if raw.strip() else ""
     if "verse" in token:
@@ -117,19 +133,32 @@ class ProseVerseClassifier:
             do_sample=False,     # greedy decoding → deterministic
         )
         self._tokenizer = tokenizer
-        print(f"✅ Model ready on device: {model.device}\n")
+
+        # Detect whether this model ships with a chat template.
+        # Base models like Phi-2 do not; we fall back to a plain prompt.
+        self._has_chat_template: bool = (
+            getattr(tokenizer, "chat_template", None) is not None
+        )
+        mode = "chat-template" if self._has_chat_template else "plain-instruct (no chat template)"
+        print(f"✅ Model ready on device: {model.device}  |  prompt mode: {mode}\n")
 
     # ── Public API ────────────────────────────────────────────────────────────
 
     def classify(self, text: str) -> ClassificationResult:
         """Classify a single piece of text."""
-        prompt = self._tokenizer.apply_chat_template(
-            _build_messages(text),
-            tokenize=False,
-            add_generation_prompt=True,
-        )
-        output  = self._pipe(prompt)
-        raw     = output[0]["generated_text"][len(prompt):].strip()
+        if self._has_chat_template:
+            # Modern instruction-tuned models (Qwen, Mistral, Llama 3, …)
+            prompt = self._tokenizer.apply_chat_template(
+                _build_messages(text),
+                tokenize=False,
+                add_generation_prompt=True,
+            )
+        else:
+            # Base / completion models without a chat template (e.g. Phi-2)
+            prompt = _build_plain_prompt(text)
+
+        output = self._pipe(prompt)
+        raw    = output[0]["generated_text"][len(prompt):].strip()
         return ClassificationResult(
             text=text,
             label=_parse_label(raw),
