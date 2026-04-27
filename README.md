@@ -1,6 +1,8 @@
 # advanced-nlp-17
 Repository for the Advanced NLP Block-Course at Osnabrück University.
 
+We used the nanoGPT repository at https://github.com/karpathy/nanogpt as the model and build upon it.
+
 ---
 
 # Getting Started
@@ -30,12 +32,18 @@ And execute setup script
 python setup.py
 ```
 
+If you have a **blackwell-series GPU**, which is not yet supported by the stable torch, you might need to install the nightly torch version. 
+The setup script informs you in the last couple of lines if that is applicable for you.
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu129
+```
+
 You should be all set to execute the main programs for each task!
 
 ---
 
 # Task 1
-Task one was concerned with investigating scaling laws (Hoffman et al, 2022, https://doi.org/10.48550/arXiv.2203.15556).
+Task one was concerned with investigating scaling laws (Hoffman et al., 2022, https://doi.org/10.48550/arXiv.2203.15556).
 For this we trained four models on each of the four partial datasets.
 |    | Layers | Heads | Embedding  | Params     | Dataset-Parts |
 |----|--------|-------|------------|-----------:|---------------|
@@ -55,7 +63,7 @@ To see all of this in action, execute
 ```bash
 python chinchilla.py
 ```
-and the aforementioned Jupyter Notebook.
+and the visualisations in the aforementioned Jupyter Notebook.
 
 # Task 2
 TODO
