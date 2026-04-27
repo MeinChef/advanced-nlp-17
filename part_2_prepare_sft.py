@@ -121,7 +121,7 @@ def prepare_training(task: str):
 
     # create a mapping from characters to integers
     stoi = { ch:i for i,ch in enumerate(chars) }
-    print(stoi)
+    #print(stoi)
     itos = { i:ch for i,ch in enumerate(chars) }
     def encode(s):
         return [stoi[c] for c in s] # encoder: take a string, output a list of integers
