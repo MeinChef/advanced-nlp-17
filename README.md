@@ -46,7 +46,7 @@ For this we trained four models on each of the four partial datasets.
 
 We trained every model for a fixed amount of iterations.
 Since `batch_size` and `block_size` are fixed across trials, we know that with every batch (64 * 256) the model has seen 16384 tokens.
-The amount of batches (iterations) can then be calculated with `params / 16384 * 20` ([code](chinchilla.py#116)).
+The amount of batches (iterations) can then be calculated with `params / 16384 * 20` ([code](chinchilla.py?plain=1#L116)).
 
 The terminal output will get written into `train.out` and `sample.out` within folders with of the naming scheme `logs/out-shakespeare-{layers}-{embed}-{dataset_split}`.
 From there we created visualisations (see [part_X_vis_TASK.ipynb](part_1_vis_Scaling_Laws.ipynb)).
