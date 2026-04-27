@@ -3,7 +3,7 @@ from email.mime import text
 import re
 import numpy as np
 import random
-from part_2_prose_vs_verse_classifier import ProseVerseClassifier
+#from part_2_prose_vs_verse_classifier import ProseVerseClassifier
 import os
 import pickle
 import requests
@@ -31,33 +31,52 @@ def sft_prepare_task1(data):
     random.shuffle(speaker_identification_dataset)
 
     full_dataset = '\n\n'.join(speaker_identification_dataset)
+    print(len(speaker_identification_dataset))
 
     return full_dataset
 
 def sft_prepare_task2(data):
     all_dialogues = data.split('\n\n')
-    clf = ProseVerseClassifier()
+    #clf = ProseVerseClassifier()
     VerseVsProse_identification_dataset = []
     list_of_texts = []
-    for block in all_dialogues[:50]:
+    vowels = ['a', 'i', 'u', 'e', 'o', 'y']
+    classify_token = '|' #replaces [CLASSIFY]
+    answer_token = '<' #replaces [ANSWER]
+    end_token = '>' #replaces [END]
+
+    for block in all_dialogues:
         lines = block.split('\n')
         lines = lines[1:]
+        vowel_count_list = []
         if len(lines) >= 3 and len(lines) <= 5:
+            for line in lines:
+                char_counter = Counter(line)
+                vowel_count = 0
+                for vowel in vowels:
+                    vowel_count += char_counter[vowel]
+                vowel_count_list.append(vowel_count)
+            
+            if np.any(np.abs(np.diff(np.array(vowel_count_list))) > 3):
+                dialogue_classification = 'PROSE'
+            elif np.all(np.abs(np.diff(np.array(vowel_count_list))) <= 3):
+                dialogue_classification = 'VERSE'
             block_without_speaker = '\n'.join(lines)
-            list_of_texts.append(block_without_speaker)
-    
-    classified_datalist = clf.classify_batch(list_of_texts)
-    print(classified_datalist)
-    for classified_data in classified_datalist:
-        classify_token = '|' #replaces [CLASSIFY]
-        answer_token = '<' #replaces [ANSWER]
-        end_token = '>' #replaces [END]
-        input = f'{classify_token} ' + classified_data.text + f' {answer_token} ' + classified_data.label.value.upper() + f' {end_token}'
-        VerseVsProse_identification_dataset.append(input)
-    random.shuffle(VerseVsProse_identification_dataset)
+            input = f'{classify_token} ' + block_without_speaker + f' {answer_token} ' + dialogue_classification + f' {end_token}'
+            VerseVsProse_identification_dataset.append(input)
+            #list_of_texts.append(block_without_speaker)
 
     full_dataset = '\n\n'.join(VerseVsProse_identification_dataset)
+    print(len(VerseVsProse_identification_dataset))
 
+    return full_dataset
+
+def sft_prepare_multitask(data):
+    speaker_identification_dataset = sft_prepare_task1(data).split('\n\n')
+    VerseVsProse_identification_dataset = sft_prepare_task2(data).split('\n\n')
+    combined_dataset = speaker_identification_dataset + VerseVsProse_identification_dataset
+    random.shuffle(combined_dataset)
+    full_dataset = '\n\n'.join(combined_dataset)
     return full_dataset
 
 """
@@ -115,11 +134,10 @@ def prepare_training(task: str):
     elif task == 'Task 2':
         preprocessed_data = sft_prepare_task2(data)
     elif task == 'Multi-Task':
-        print('TO DO')
-        #chars = sorted(list(set(data)) + ['@', '|', '<', '>'])
+        preprocessed_data = sft_prepare_multitask(data)
     elif task == 'Pre-Trained':
         preprocessed_data = data
-    print(preprocessed_data)
+    #print(preprocessed_data)
     n = len(preprocessed_data)
     train_data = preprocessed_data[:int(n*0.8)] # make sure the validation set is not too small
     val_data = preprocessed_data[int(n*0.8):] # make sure the validation set is not too small
