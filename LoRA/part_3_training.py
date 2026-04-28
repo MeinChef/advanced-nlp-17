@@ -35,6 +35,6 @@ def train(experiment: str):
         return
 
     os.system(
-        f'cd nanoGPT && python finetune_lora.py config/training_{experiment}.py '
+        f'cd nanoGPT && python train_lora.py config/training_{experiment}.py '
         f'| ts | tee logs/{experiment}.log'
     )
