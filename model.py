@@ -162,6 +162,10 @@ class GPT(nn.Module):
 
         # init all weights
         self.apply(self._init_weights)
+        # re-zero all LoRA B matrices (apply() overwrites them)
+        for module in self.modules():
+            if isinstance(module, LoRALinear):
+                torch.nn.init.zeros_(module.B)
         # apply special scaled init to the residual projections, per GPT-2 paper
         for pn, p in self.named_parameters():
             if pn.endswith('c_proj.weight'):
