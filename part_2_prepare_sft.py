@@ -17,6 +17,7 @@ def sft_prepare_task1(data):
 
     speaker_counts = Counter(speakers)
     common_speakers = np.array(speaker_counts.most_common(10)).T[0]
+    print(common_speakers)
 
     all_dialogues = data.split('\n\n')
     speaker_identification_dataset = []

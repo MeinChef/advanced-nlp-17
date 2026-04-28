@@ -11,7 +11,6 @@ def train(model: str):
             'Multi-Task'
             'Pre-Trained'
     """
-    
 
     if model == 'Task 1':
         os.system('cd nanoGPT && python train.py config/training_shakespeare_task1.py | ts | tee logs/shakespeare_task1.log')
