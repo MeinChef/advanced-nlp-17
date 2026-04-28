@@ -2,7 +2,7 @@ import torch
 from model import GPT, GPTConfig, freeze_base_params, count_trainable
 
 # Load the same checkpoint for both models
-ckpt = torch.load('out/ckpt.pt', map_location='cpu')
+ckpt = torch.load('out-shakespeare-6-384-1/ckpt.pt', map_location='cpu')
 
 # Load with LoRA
 config_lora = GPTConfig(**{**ckpt['model_args'], 'lora_rank': 4})
