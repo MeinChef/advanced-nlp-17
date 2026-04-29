@@ -61,7 +61,6 @@ def evaluate_model(
     ) -> None:
     # Usage
 
-    
     if model == 'pre':
         print(f'accuracy of the {model}-model:')
         print('- task1: 0%')
@@ -94,8 +93,9 @@ def evaluate_model(
     elif model == 'multi':
         val_dataset = [parse_entry('@', entry) for entry in val_processed_dataset]#.remove(('', ''))
         val_dataset += [parse_entry('|', entry) for entry in val_processed_dataset]#.remove(('', ''))
-    
-    #print(val_dataset[:20])
+    else:
+        val_dataset = val_preprocessed_dataset # TODO: @ Lucas is this correct?
+
     correct = [0, 0] #task 1, task 2-specific correct
     total = [0, 0]
     for sample_input in val_dataset:        
@@ -165,6 +165,6 @@ def evaluate_model(
             'part_2_logs',
             'accuracies.log'
             ), 
-            'a'
+            'a+'
         ) as f:
         f.write(str([model, accuracy_task1, accuracy_task2]) + '\n')
