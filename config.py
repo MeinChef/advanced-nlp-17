@@ -10,6 +10,8 @@ class GPTConfiguration:
     n_layer: int = 6
     n_head: int = 6
     n_embed: int = 384
+    lr: float = 1e-3
+    dataset: str = "shakespeare_char"
     eval_iters: int = 200
     eval_interval: int = 250
     eval_samples: int = 5
@@ -36,7 +38,7 @@ class GPTConfiguration:
             wandb_log = False
             wandb_project = 'nanoGPT-assignment'
             wandb_run_name = 'baseline'
-            dataset = 'shakespeare_char'
+            dataset = '{self.dataset}'
             gradient_accumulation_steps = 1
             batch_size = {self.batch_size}
             block_size = 256
