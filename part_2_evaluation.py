@@ -42,11 +42,11 @@ def parse_entry(token: str, dialogue: str):
 def evaluate_model(model: str):
     # Usage
     if model == 'Task 1':
-        val_preprocessed_dataset = decode_val_bin('nanoGPT/data/shakespeare_task1/val.bin', 'nanoGPT/data/shakespeare_task1/meta.pkl')
+        val_preprocessed_dataset = decode_val_bin(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_task1/val.bin'), os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_task1/meta.pkl'))
     elif model == 'Task 2':
-        val_preprocessed_dataset = decode_val_bin('nanoGPT/data/shakespeare_task2/val.bin', 'nanoGPT/data/shakespeare_task2/meta.pkl')
+        val_preprocessed_dataset = decode_val_bin(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_task2/val.bin'), os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_task2/meta.pkl'))
     elif model == 'Multi-Task':
-        val_preprocessed_dataset = decode_val_bin('nanoGPT/data/shakespeare_multitask/val.bin', 'nanoGPT/data/shakespeare_multitask/meta.pkl')
+        decode_val_bin(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_multitask/val.bin'), os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_multitask/meta.pkl'))
     elif model == 'Pre-Trained':
         print(f'accuracy of the {model}-model:')
         print(f'- Task 1: 0%')
@@ -76,7 +76,7 @@ def evaluate_model(model: str):
             out_dir = 'task2'
         elif model == 'Multi-Task':
             out_dir = 'multitask'
-        terminal_output = os.popen(f'cd nanoGPT && python sample.py --out_dir=out-shakespeare_{out_dir} --device=cuda --num_samples=1 --max_new_tokens=30 --start="{sample_input[0]}"').read()
+        terminal_output = os.popen(f'cd {os.path.join(os.path.dirname(__file__), 'nanoGPT')} && python sample.py --out_dir=out-shakespeare_{out_dir} --device=cuda --num_samples=1 --max_new_tokens=30 --start="{sample_input[0]}"').read()
         try:
             match = re.search(rf'<\s*([A-Z_]+)\s*>', terminal_output, re.DOTALL).group(1).strip()
         except:
@@ -108,3 +108,7 @@ def evaluate_model(model: str):
     print(f'accuracy of the {model}-model:')
     print(f'- Task 1: {accuracy_task1 * 100}%')
     print(f'- Task 2: {accuracy_task2 * 100}%')
+
+    with open(os.path.join(os.path.dirname(__file__), 'part_2_logs/accuracies.log'), 'a') as f:
+        f.write(str([model, accuracy_task1, accuracy_task2]) + '\n')
+    f.close()

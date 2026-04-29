@@ -32,16 +32,16 @@ def prepare_configs(device_type: str, has_logs: bool = True):
         new_file_content = re.sub(r'(out_dir = )\S+', rf"\g<1>'out-{experiment}'", new_file_content)
         #when modifying the number of embeddings we have to modify the number of heads too
         #write the parameters to a new config file
-        with open(f'nanoGPT/config/training_{experiment}.py', 'w') as file:
+        with open(os.path.join(os.path.dirname(__file__), f'nanoGPT/config/training_{experiment}.py'), 'w') as file:
             file.write(new_file_content)
         file.close()
 
     if not has_logs:
         try:
-            os.mkdir('nanoGPT/logs') #try to create the log folder if it doesn't exist
+            os.mkdir(os.path.join(os.path.dirname(__file__), 'nanoGPT/part_2_logs')) #try to create the log folder if it doesn't exist
         except:
             print('folder either already exists or could not be created')
         finally: #create one log file for each model for training later on
             for experiment in experiments_variants:
-                with open(f'nanoGPT/logs/{experiment}.log', 'w+') as file:
+                with open(os.path.join(os.path.dirname(__file__), f'nanoGPT/part_2_logs/{experiment}.log'), 'w+') as file:
                     pass

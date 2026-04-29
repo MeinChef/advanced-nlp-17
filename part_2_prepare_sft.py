@@ -162,7 +162,7 @@ def prepare_training(task: str):
 
     if task == 'Task 1':
         try:
-            os.mkdir('nanoGPT/data/shakespeare_task1')
+            os.mkdir(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_task1'))
         except:
             print('folder \'shakespeare_task1\' already exists or could not be created')
         finally:
@@ -172,7 +172,7 @@ def prepare_training(task: str):
                 pickle.dump(meta, f)
     elif task == 'Task 2':
         try:
-            os.mkdir('nanoGPT/data/shakespeare_task2')
+            os.mkdir(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_task2'))
         except:
             print('folder \'shakespeare_task2\' already exists or could not be created')
         finally:
@@ -182,7 +182,7 @@ def prepare_training(task: str):
                 pickle.dump(meta, f)
     elif task == 'Multi-Task':
         try:
-            os.mkdir('nanoGPT/data/shakespeare_multitask')
+            os.mkdir(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_multitask'))
         except:
             print('folder \'shakespeare_multitask\' already exists or could not be created')
         finally:
