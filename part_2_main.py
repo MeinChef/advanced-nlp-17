@@ -1,28 +1,19 @@
-import part_2_prepare_sft
-# import part_2_train_config # replace with GPTConfiguration
-import part_2_training
-import part_2_evaluation
+from part_2_prepare_sft import prepare_training
+from part_2_evaluation import evaluate_model
 from config import GPTConfiguration
 import shutil
 import os
+import subprocess
+import sys
 import torch
 
 
 if __name__ == "__main__":
-    models = ['task1', 'task2', 'multi', 'pre']
+    models = ['task1', 'task2', 'multi', 'char']
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     # preparing the data
     for model in models:
-        part_2_prepare_sft.prepare_training(model)
-
-    # TODO: create logs folder
-    # prepare the training files
-    # part_2_train_config.prepare_configs(
-    #     device_type = device,
-    #     has_logs = False
-    # ) 
-
-    # IF has_logs FALSE WILL CREATE LOG FILES BUT ERASE ALL PREVIOUS ONES
+        prepare_training(model)
 
     # train the models
     # COMPUTATIONALLY EXPENSIVE
@@ -31,8 +22,9 @@ if __name__ == "__main__":
             n_layer = 5,
             n_head = 5,
             n_embed = 320,
-            lr = 1e-3 if model == "pre" else 1e-4,
-            dataset = f"shakespeare_{model if model != 'pre' else 'char'}",
+            init_from = "resume",
+            lr = 1e-3 if model == "char" else 1e-4,
+            dataset = f"shakespeare_{model}",
             name = model
         )
         cfg.set_backend()
@@ -43,29 +35,62 @@ if __name__ == "__main__":
             )
         )
 
-        # TODO: do that with subprocess.run (and also here)
-        part_2_training.train(model)
+        current_outpath = os.path.join(
+            os.path.dirname(__file__),
+            "logs",
+            f"out-shakespeare-{cfg.name}"
+        )
+        os.makedirs(
+            current_outpath,
+            exist_ok = True
+        )
 
-    new_dest = shutil.move(
-        os.path.join(
-            os.path.dirname(__file__), 
-            'nanoGPT',
-            'part_2_logs'
-        ), 
-        os.path.dirname(__file__)
-    )
+        # and copy the best model to that
+        shutil.copy(
+            src = os.path.join(
+                os.path.dirname(__file__),
+                "nanoGPT",
+                "out-shakespeare-5-320-1",
+                "ckpt.pt"
+            ),
+            dst = os.path.join(
+                current_outpath,
+                "ckpt.pt"
+            )
+        )
 
-    # create file if didn't exist
-    with open(os.path.join(
-        os.path.dirname(__file__), 
-        'part_2_logs',
-        'accuracies.log'
-    ), 'a+') as f:
-        f.close()
-
-    # evaluate the models
-    for model in models:
-        part_2_evaluation.evaluate_model(
+        # training
+        with open(
+            os.path.join(
+                current_outpath,
+                "train.out"
+            ),
+            "w+"
+        ) as log:
+            subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "train",
+                    os.path.join(
+                        os.path.dirname(__file__),
+                        "nanoGPT",
+                        "config",
+                        f"train-shakespeare-char-{model}"
+                    )
+                ],
+                cwd = os.path.join(
+                    os.path.dirname(__file__), 
+                    "nanoGPT"
+                ),
+                text = True,
+                encoding = "utf-8",
+                stdout = log,
+                check = True
+            )
+        
+        # and evaluate them
+        evaluate_model(
             model = model,
             device = device
         )
