@@ -1,9 +1,7 @@
 from collections import Counter
-from email.mime import text # not accessed - needed?
 import re
 import numpy as np
 import random
-#from part_2_prose_vs_verse_classifier import ProseVerseClassifier
 import os
 import pickle
 import requests
@@ -24,10 +22,17 @@ def sft_prepare_task1(data):
     for speaker in common_speakers:
         for block in all_dialogues:
             if block.startswith(speaker + ':'):
-                speaker_token = '@' #replaces [SPEAKER]
-                answer_token = '<' #replaces [ANSWER]
-                end_token = '>' #replaces [END]
-                input = f'{speaker_token} ' + block[len(speaker) + 1:].strip() + f' {answer_token} ' + speaker + f' {end_token}'
+                speaker_token = '@'         #replaces [SPEAKER]
+                answer_token = '<'          #replaces [ANSWER]
+                end_token = '>'             #replaces [END]
+                # input = f'{speaker_token} ' + block[len(speaker) + 1:].strip() + f' {answer_token} ' + speaker + f' {end_token}'
+                input = " ".join([
+                    speaker_token,
+                    block[len(speaker) + 1:].strip(),
+                    answer_token,
+                    speaker,
+                    end_token
+                ])
                 speaker_identification_dataset.append(input)
     random.shuffle(speaker_identification_dataset)
 
@@ -38,12 +43,11 @@ def sft_prepare_task1(data):
 
 def sft_prepare_task2(data):
     all_dialogues = data.split('\n\n')
-    #clf = ProseVerseClassifier()
     VerseVsProse_identification_dataset = []
     vowels = ['a', 'i', 'u', 'e', 'o', 'y']
-    classify_token = '|' #replaces [CLASSIFY]
-    answer_token = '<' #replaces [ANSWER]
-    end_token = '>' #replaces [END]
+    classify_token = '|'        #replaces [CLASSIFY]
+    answer_token = '<'          #replaces [ANSWER]
+    end_token = '>'             #replaces [END]
 
     for block in all_dialogues:
         lines = block.split('\n')
@@ -61,6 +65,9 @@ def sft_prepare_task2(data):
                 dialogue_classification = 'PROSE'
             elif np.all(np.abs(np.diff(np.array(vowel_count_list))) <= 3):
                 dialogue_classification = 'VERSE'
+            else:
+                continue
+
             block_without_speaker = '\n'.join(lines)
             input = f'{classify_token} ' + block_without_speaker + f' {answer_token} ' + dialogue_classification + f' {end_token}'
             VerseVsProse_identification_dataset.append(input)
@@ -93,7 +100,7 @@ def prepare_training(task: str):
             'task1': trained for speaker identification
             'task3': trained for verse vs prose identification
             'multi': trained for both at the same time
-            'pre': trained without any specific task
+            'char': trained without any specific task
     """
     # download the tiny shakespeare dataset
     input_file_path = os.path.join(os.path.dirname(__file__), 'input.txt')
@@ -113,7 +120,7 @@ def prepare_training(task: str):
         chars = sorted(list(set(data)) + ['|', '<', '>'])
     elif task == 'multi':
         chars = sorted(list(set(data)) + ['@', '|', '<', '>'])
-    elif task == 'pre':
+    elif task == 'char':
         chars = sorted(list(set(data)))
     else:
         raise ValueError(
@@ -127,7 +134,6 @@ def prepare_training(task: str):
 
     # create a mapping from characters to integers
     stoi = { ch:i for i,ch in enumerate(chars) }
-    #print(stoi)
     itos = { i:ch for i,ch in enumerate(chars) }
     def encode(s):
         return [stoi[c] for c in s] # encoder: take a string, output a list of integers
@@ -141,9 +147,9 @@ def prepare_training(task: str):
         preprocessed_data = sft_prepare_task2(data)
     elif task == 'multi':
         preprocessed_data = sft_prepare_multitask(data)
-    elif task == 'pre':
+    elif task == 'char':
         preprocessed_data = data
-    #print(preprocessed_data)
+
     n = len(preprocessed_data)
     train_data = preprocessed_data[:int(n*0.8)] # make sure the validation set is not too small
     val_data = preprocessed_data[int(n*0.8):] # make sure the validation set is not too small
@@ -165,53 +171,29 @@ def prepare_training(task: str):
         'stoi': stoi,
     }
 
-    basepath = os.path.join(
+    # create directory
+    dirpath = os.path.join(
         os.path.dirname(__file__),
         "nanoGPT",
         "data",
+        f"shakespeare_{task}"
     )
-    if task == 'task1':
-        longpath = os.path.join(
-            basepath,
-            "shakespeare_task1"
-        )
-        if not os.path.exists(longpath):
-            os.mkdir(longpath)
-        
-    elif task == 'task2':
-        longpath = os.path.join(
-            basepath,
-            "shakespeare_task2"
-        )
-        if not os.path.exists(longpath):
-            os.mkdir(longpath)
 
-    elif task == 'multi':
-        longpath = os.path.join(
-            basepath,
-            "shakespeare_multitask"
-        )
-        if not os.path.exists(longpath):
-            os.mkdir(longpath)
-    elif task == 'pre':
-        longpath = os.path.join(
-            basepath,
-            "shakespeare_char"
-        )
-        if not os.path.exists(longpath):
-            os.mkdir(longpath)
-        
+    os.makedirs(
+        dirpath,
+        exist_ok = True
+    )        
 
     # save train and test
     train_ids.tofile(
-        os.path.join(longpath, "train.bin")
+        os.path.join(dirpath, "train.bin")
     )
     val_ids.tofile(
-        os.path.join(longpath, "val.bin")
+        os.path.join(dirpath, "val.bin")
     )
 
     # and metadata
-    with open(os.path.join(longpath, "meta.pkl"), 'wb') as f:
+    with open(os.path.join(dirpath, "meta.pkl"), 'wb') as f:
         pickle.dump(meta, f)
 
 # length of dataset in characters:  1115394
