@@ -7,7 +7,18 @@ ckpt = torch.load('nanoGPT/out-shakespeare-5-320-1/ckpt.pt', map_location='cuda'
 # Load with LoRA
 config_lora = GPTConfig(**{**ckpt['model_args'], 'lora_rank': 4})
 model_lora = GPT(config_lora)
-model_lora.load_state_dict(ckpt['model'], strict=False)
+
+state_dict = ckpt['model']
+remapped = {}
+for k, v in state_dict.items():
+    if 'c_attn.weight' in k:
+        remapped[k.replace('c_attn.weight', 'c_attn.original.weight')] = v
+    elif 'c_attn.bias' in k:
+        remapped[k.replace('c_attn.bias', 'c_attn.original.bias')] = v
+    else:
+        remapped[k] = v
+model_lora.load_state_dict(remapped, strict=False)
+
 freeze_base_params(model_lora)
 
 # Check 1: only LoRA params are trainable
