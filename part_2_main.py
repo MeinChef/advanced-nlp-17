@@ -3,6 +3,7 @@ import part_2_train_config
 import part_2_training
 import part_2_evaluation
 import shutil
+import os
 
 
 models = ['Task 1', 'Task 2', 'Multi-Task', 'Pre-Trained']
