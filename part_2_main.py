@@ -11,7 +11,7 @@ for model in models:
     part_2_prepare_sft.prepare_training(model)
 
 #prepare the training files
-part_2_train_config.prepare_configs(device_type='cuda', has_logs=True) #IF FALSE WILL CREATE LOG FILES BUT ERASE ALL PREVIOUS ONES
+part_2_train_config.prepare_configs(device_type='cuda', has_logs=false) #IF FALSE WILL CREATE LOG FILES BUT ERASE ALL PREVIOUS ONES
 
 #train the models
 #COMPUTATIONALLY EXPENSIVE

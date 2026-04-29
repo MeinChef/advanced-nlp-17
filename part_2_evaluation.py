@@ -76,7 +76,7 @@ def evaluate_model(model: str):
             out_dir = 'task2'
         elif model == 'Multi-Task':
             out_dir = 'multitask'
-        terminal_output = os.popen(f'cd {os.path.join(os.path.dirname(__file__), 'nanoGPT')} && python sample.py --out_dir=out-shakespeare_{out_dir} --device=cuda --num_samples=1 --max_new_tokens=30 --start="{sample_input[0]}"').read()
+        terminal_output = os.popen(f"cd {os.path.join(os.path.dirname(__file__), 'nanoGPT')} && python sample.py --out_dir=out-shakespeare_{out_dir} --device=cuda --num_samples=1 --max_new_tokens=30 --start=\"{sample_input[0]}\"").read()
         try:
             match = re.search(rf'<\s*([A-Z_]+)\s*>', terminal_output, re.DOTALL).group(1).strip()
         except:
