@@ -32,7 +32,7 @@ class LoRALinear(nn.Module):
         self.original = original_linear
         self.original.weight.requires_grad = False  # freeze base weights
         d_out, d_in = original_linear.weight.shape
-        self.A = nn.Parameter(torch.randn(rank, d_in) * 0.01)
+        self.A = nn.Parameter(torch.randn(rank, d_in)) 
         self.B = nn.Parameter(torch.zeros(d_out, rank))  # B=0 → identity init
 
     def forward(self, x):
