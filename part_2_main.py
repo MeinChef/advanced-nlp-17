@@ -43,6 +43,7 @@ if __name__ == "__main__":
             )
         )
 
+        # TODO: do that with subprocess.run (and also here)
         part_2_training.train(model)
 
     new_dest = shutil.move(
