@@ -46,7 +46,7 @@ class GPTConfiguration:
             n_head = {self.n_head}
             n_embd = {self.n_embed}
             dropout = 0.2
-            learning_rate = 1e-3
+            learning_rate = {self.lr}
             max_iters = {self.max_iters}
             lr_decay_iters = 100
             min_lr = 1e-4
@@ -90,5 +90,4 @@ class GPTConfiguration:
             f.write(str(self))
 
     # TODO:
-    #   - function write to file
     #   - filename in class
