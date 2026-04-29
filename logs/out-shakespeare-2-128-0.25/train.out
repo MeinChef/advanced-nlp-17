@@ -1,0 +1,57 @@
+Overriding config with C:\VS-CODE-UNI-OS\advanced-nlp-17\nanoGPT\config\train-shakespeare-char-2-128-0.25.py:
+
+# Baseline configuration
+out_dir = 'out-shakespeare-2-128-0.25'
+eval_interval = 50
+eval_iters = 5
+log_interval = 10
+always_save_checkpoint = True
+init_from = 'scratch'
+wandb_log = False
+wandb_project = 'nanoGPT-assignment'
+wandb_run_name = 'baseline'
+dataset = 'shakespeare_char'
+gradient_accumulation_steps = 1
+batch_size = 64
+block_size = 256
+n_layer = 2
+n_head = 2
+n_embd = 128
+dropout = 0.2
+learning_rate = 1e-3
+max_iters = 146.0
+lr_decay_iters = 100
+min_lr = 1e-4
+beta2 = 0.99
+warmup_iters = 200
+weight_decay = 1e-1
+device = 'cuda'
+compile = False 
+
+tokens per iteration will be: 16,384
+found vocab_size = 65 (inside data\shakespeare_char\meta.pkl)
+Initializing a new model from scratch
+number of parameters: 434944
+num decayed parameter tensors: 10, with 434,304 parameters
+num non-decayed parameter tensors: 5, with 640 parameters
+using fused AdamW: True
+step 0: train loss 4.1899, val loss 4.1843
+iter 0: loss 4.1908, time 183.12ms, mfu -100.00%
+iter 10: loss 4.0108, time 4.11ms, mfu 4.09%
+iter 20: loss 3.7199, time 3.98ms, mfu 4.10%
+iter 30: loss 3.5887, time 3.00ms, mfu 4.25%
+iter 40: loss 3.4223, time 4.16ms, mfu 4.23%
+step 50: train loss 3.1755, val loss 3.1992
+saving checkpoint to out-shakespeare-2-128-0.25
+iter 50: loss 3.2283, time 31.84ms, mfu 3.86%
+iter 60: loss 3.0579, time 4.17ms, mfu 3.88%
+iter 70: loss 2.8997, time 3.00ms, mfu 4.05%
+iter 80: loss 2.8019, time 5.00ms, mfu 3.98%
+iter 90: loss 2.7294, time 4.00ms, mfu 4.00%
+step 100: train loss 2.6106, val loss 2.6752
+saving checkpoint to out-shakespeare-2-128-0.25
+iter 100: loss 2.6507, time 39.31ms, mfu 3.64%
+iter 110: loss 2.6219, time 3.00ms, mfu 3.84%
+iter 120: loss 2.6031, time 4.00ms, mfu 3.88%
+iter 130: loss 2.5761, time 3.15ms, mfu 4.02%
+iter 140: loss 2.5615, time 4.00ms, mfu 4.04%

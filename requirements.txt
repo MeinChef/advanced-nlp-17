@@ -6,4 +6,4 @@ tiktoken
 wandb
 tqdm
 matplotlib
-
+adjustText
