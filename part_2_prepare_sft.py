@@ -1,5 +1,5 @@
 from collections import Counter
-from email.mime import text
+from email.mime import text # not accessed - needed?
 import re
 import numpy as np
 import random
@@ -40,7 +40,6 @@ def sft_prepare_task2(data):
     all_dialogues = data.split('\n\n')
     #clf = ProseVerseClassifier()
     VerseVsProse_identification_dataset = []
-    list_of_texts = []
     vowels = ['a', 'i', 'u', 'e', 'o', 'y']
     classify_token = '|' #replaces [CLASSIFY]
     answer_token = '<' #replaces [ANSWER]
@@ -80,21 +79,21 @@ def sft_prepare_multitask(data):
     full_dataset = '\n\n'.join(combined_dataset)
     return full_dataset
 
-"""
-Prepare the Shakespeare dataset for character-level language modeling.
-So instead of encoding with GPT-2 BPE tokens, we just map characters to ints.
-Will save train.bin, val.bin containing the ids, and meta.pkl containing the
-encoder and decoder and some other related info.
-"""
+
+# Prepare the Shakespeare dataset for character-level language modeling.
+# So instead of encoding with GPT-2 BPE tokens, we just map characters to ints.
+# Will save train.bin, val.bin containing the ids, and meta.pkl containing the
+# encoder and decoder and some other related info.
+
 def prepare_training(task: str):
     """
     Prepare training based on the task  with SFT given by modifying the dataset for said task
     Parameters:
         task (str): 4 choices
-            'Task 1': trained for speaker identification
-            'Task 2': trained for verse vs prose identification
-            'Multi-Task': trained for both at the same time
-            'Pre-Trained': trained without any specific task
+            'task1': trained for speaker identification
+            'task3': trained for verse vs prose identification
+            'multi': trained for both at the same time
+            'pre': trained without any specific task
     """
     # download the tiny shakespeare dataset
     input_file_path = os.path.join(os.path.dirname(__file__), 'input.txt')
@@ -108,14 +107,20 @@ def prepare_training(task: str):
     print(f"length of dataset in characters: {len(data):,}")
 
     # get all the unique characters that occur in this text
-    if task == 'Task 1':
+    if task == 'task1':
         chars = sorted(list(set(data)) + ['@', '<', '>'])
-    elif task == 'Task 2':
+    elif task == 'task2':
         chars = sorted(list(set(data)) + ['|', '<', '>'])
-    elif task == 'Multi-Task':
+    elif task == 'multi':
         chars = sorted(list(set(data)) + ['@', '|', '<', '>'])
-    elif task == 'Pre-Trained':
+    elif task == 'pre':
         chars = sorted(list(set(data)))
+    else:
+        raise ValueError(
+            "Parameter 'task' not recognised. Expected 'task1', 'task2', 'multi', or 'pre'\n"
+            f"Got {task} instead"
+        )
+    
     vocab_size = len(chars)
     print("all the unique characters:", ''.join(chars))
     print(f"vocab size: {vocab_size:,}")
@@ -126,17 +131,17 @@ def prepare_training(task: str):
     itos = { i:ch for i,ch in enumerate(chars) }
     def encode(s):
         return [stoi[c] for c in s] # encoder: take a string, output a list of integers
-    def decode(l):
-        return ''.join([itos[i] for i in l]) # decoder: take a list of integers, output a string
+    def decode(L):
+        return ''.join([itos[i] for i in L]) # decoder: take a list of integers, output a string
 
     # create the train and test splits
-    if task == 'Task 1':
+    if task == 'task1':
         preprocessed_data = sft_prepare_task1(data)
-    elif task == 'Task 2':
+    elif task == 'task2':
         preprocessed_data = sft_prepare_task2(data)
-    elif task == 'Multi-Task':
+    elif task == 'multi':
         preprocessed_data = sft_prepare_multitask(data)
-    elif task == 'Pre-Trained':
+    elif task == 'pre':
         preprocessed_data = data
     #print(preprocessed_data)
     n = len(preprocessed_data)
@@ -150,8 +155,8 @@ def prepare_training(task: str):
     print(f"val has {len(val_ids):,} tokens")
 
     # export to bin files
-    train_ids = np.array(train_ids, dtype=np.uint16)
-    val_ids = np.array(val_ids, dtype=np.uint16)
+    train_ids = np.array(train_ids, dtype = np.uint16)
+    val_ids = np.array(val_ids, dtype = np.uint16)
 
     # save the meta information as well, to help us encode/decode later
     meta = {
@@ -160,41 +165,54 @@ def prepare_training(task: str):
         'stoi': stoi,
     }
 
-    if task == 'Task 1':
-        try:
-            os.mkdir(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_task1'))
-        except:
-            print('folder \'shakespeare_task1\' already exists or could not be created')
-        finally:
-            train_ids.tofile(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_task1/train.bin'))
-            val_ids.tofile(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_task1/val.bin'))
-            with open(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_task1/meta.pkl'), 'wb') as f:
-                pickle.dump(meta, f)
-    elif task == 'Task 2':
-        try:
-            os.mkdir(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_task2'))
-        except:
-            print('folder \'shakespeare_task2\' already exists or could not be created')
-        finally:
-            train_ids.tofile(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_task2/train.bin'))
-            val_ids.tofile(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_task2/val.bin'))
-            with open(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_task2/meta.pkl'), 'wb') as f:
-                pickle.dump(meta, f)
-    elif task == 'Multi-Task':
-        try:
-            os.mkdir(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_multitask'))
-        except:
-            print('folder \'shakespeare_multitask\' already exists or could not be created')
-        finally:
-            train_ids.tofile(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_multitask/train.bin'))
-            val_ids.tofile(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_multitask/val.bin'))
-            with open(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_multitask/meta.pkl'), 'wb') as f:
-                pickle.dump(meta, f)
-    elif task == 'Pre-Trained':
-        train_ids.tofile(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_char/train.bin'))
-        val_ids.tofile(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_char/val.bin'))
-        with open(os.path.join(os.path.dirname(__file__), 'nanoGPT/data/shakespeare_char/meta.pkl'), 'wb') as f:
-                pickle.dump(meta, f)
+    basepath = os.path.join(
+        os.path.dirname(__file__),
+        "nanoGPT",
+        "data",
+    )
+    if task == 'task1':
+        longpath = os.path.join(
+            basepath,
+            "shakespeare_task1"
+        )
+        if not os.path.exists(longpath):
+            os.mkdir(longpath)
+        
+    elif task == 'task2':
+        longpath = os.path.join(
+            basepath,
+            "shakespeare_task2"
+        )
+        if not os.path.exists(longpath):
+            os.mkdir(longpath)
+
+    elif task == 'multi':
+        longpath = os.path.join(
+            basepath,
+            "shakespeare_multitask"
+        )
+        if not os.path.exists(longpath):
+            os.mkdir(longpath)
+    elif task == 'pre':
+        longpath = os.path.join(
+            basepath,
+            "shakespeare_char"
+        )
+        if not os.path.exists(longpath):
+            os.mkdir(longpath)
+        
+
+    # save train and test
+    train_ids.tofile(
+        os.path.join(longpath, "train.bin")
+    )
+    val_ids.tofile(
+        os.path.join(longpath, "val.bin")
+    )
+
+    # and metadata
+    with open(os.path.join(longpath, "meta.pkl"), 'wb') as f:
+        pickle.dump(meta, f)
 
 # length of dataset in characters:  1115394
 # all the unique characters:
