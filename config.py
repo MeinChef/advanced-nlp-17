@@ -9,6 +9,7 @@ class GPTConfiguration:
     n_layer: int = 6
     n_head: int = 6
     n_embed: int = 384
+    lr: float = 1e-3
     device: str = "cpu"
     compile: bool = False
     name: str = "baseline"
@@ -34,7 +35,7 @@ class GPTConfiguration:
             n_head = {self.n_head}
             n_embd = {self.n_embed}
             dropout = 0.2
-            learning_rate = 1e-3
+            learning_rate = {self.lr}
             max_iters = 5000
             lr_decay_iters = 5000
             min_lr = 1e-4
