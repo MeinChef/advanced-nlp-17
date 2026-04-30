@@ -94,7 +94,7 @@ def evaluate_model(
         val_dataset = [parse_entry('@', entry) for entry in val_processed_dataset]#.remove(('', ''))
         val_dataset += [parse_entry('|', entry) for entry in val_processed_dataset]#.remove(('', ''))
     else:
-        val_dataset = val_preprocessed_dataset # TODO: @ Lucas is this correct?
+        val_dataset = val_preprocessed_dataset
 
     correct = [0, 0] #task 1, task 2-specific correct
     total = [0, 0]
@@ -145,15 +145,14 @@ def evaluate_model(
             else:
                 total[0] += 1
     
-    # TODO: rework to work without except (e.g. check if total is 0?)
-    try:
-        accuracy_task1 = correct[0] / total[0]
-    except:
+    if total[0] == 0:
         accuracy_task1 = 0
-    try:
-        accuracy_task2 = correct[1] / total[1]
-    except:
+    else:
+        accuracy_task1 = correct[0] / total[0]
+    if total[1] == 0:
         accuracy_task2 = 0
+    else:
+        accuracy_task2 = correct[1] / total[1]
 
     print(f'accuracy of the {model}-model:')
     print(f'- task1: {accuracy_task1 * 100}%')
