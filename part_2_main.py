@@ -41,6 +41,11 @@ if __name__ == "__main__":
             n_layer = 5,
             n_head = 5,
             n_embed = 320,
+            eval_iters = 50,
+            eval_interval = 50, 
+            max_iters = 250,
+            save_checkpoints = True,
+
             init_from = "resume",
             lr = 1e-3 if model == "char" else 1e-4,
             dataset = f"shakespeare_{model}",
