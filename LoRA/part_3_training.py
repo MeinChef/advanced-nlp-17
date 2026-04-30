@@ -1,4 +1,7 @@
 import os
+import subprocess
+import sys
+from datetime import datetime
 
 def train(experiment: str):
     """
@@ -34,7 +37,35 @@ def train(experiment: str):
         print(f"'{experiment}' is not a supported experiment. Choose from: {valid_experiments}")
         return
 
-    os.system(
-        f'python train_lora.py config/training_{experiment}.py '
-        f'| ts | tee logs/{experiment}.log'
-    )
+    # Ensure logs directory exists
+    os.makedirs('logs', exist_ok=True)
+
+    # Get the LoRA directory (where this script is)
+    lora_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Run training with timestamp logging (Windows-compatible)
+    log_file = f'logs/{experiment}.log'
+    try:
+        with open(log_file, 'w') as log:
+            process = subprocess.Popen(
+                [sys.executable, 'train_lora.py', f'config/training_{experiment}.py'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
+                bufsize=1,
+                cwd=lora_dir  # Run from LoRA directory
+            )
+            
+            # Stream output with timestamps
+            for line in process.stdout:
+                timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                timestamped_line = f'[{timestamp}] {line}'
+                print(timestamped_line, end='')
+                log.write(timestamped_line)
+                log.flush()
+            
+            process.wait()
+            if process.returncode != 0:
+                print(f"Training failed with return code {process.returncode}", file=sys.stderr)
+    except Exception as e:
+        print(f"Error running training: {e}", file=sys.stderr)
