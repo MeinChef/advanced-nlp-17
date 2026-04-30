@@ -33,9 +33,9 @@ config_base = GPTConfig(**{**ckpt['model_args'], 'lora_rank': 0})
 model_base = GPT(config_base)
 model_base.load_state_dict(ckpt['model'], strict=True)
 
-x = torch.randint(0, config_lora.vocab_size, (1, 32))
-with torch.no_grad():
-    out_lora, _ = model_lora(x)
+x = torch.randint(0, config_lora.vocab_size, (1, 32)) # generate some random input
+with torch.no_grad():                                 # no grad needed for inference
+    out_lora, _ = model_lora(x) 
     out_base, _ = model_base(x)
 
 print("\n=== Output identity check ===")
