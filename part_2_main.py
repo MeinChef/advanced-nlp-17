@@ -15,6 +15,20 @@ if __name__ == "__main__":
     for model in models:
         prepare_training(model)
 
+    # move the custom training file to the nanoGPT folder
+    shutil.copy(
+        src = os.path.join(
+            os.path.dirname(__file__),
+            "sft"
+            "train_sft.py"
+        ),
+        dst = os.path.join(
+            os.path.dirname(__file__),
+            "nanoGPT",
+            "train_sft.py"
+        )
+    )
+
     # train the models
     # COMPUTATIONALLY EXPENSIVE
     for model in models:
@@ -73,7 +87,7 @@ if __name__ == "__main__":
                 [
                     sys.executable,
                     "-m",
-                    "train",
+                    "train_sft",
                     os.path.join(
                         os.path.dirname(__file__),
                         "nanoGPT",
