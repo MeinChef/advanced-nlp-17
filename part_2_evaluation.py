@@ -146,14 +146,14 @@ def evaluate_model(
                 total[0] += 1
     
     # TODO: rework to work without except (e.g. check if total is 0?)
-    try:
-        accuracy_task1 = correct[0] / total[0]
-    except:
+    if total[0] == 0:
         accuracy_task1 = 0
-    try:
-        accuracy_task2 = correct[1] / total[1]
-    except:
+    else:
+        accuracy_task1 = correct[0] / total[0]
+    if total[1] == 0:
         accuracy_task2 = 0
+    else:
+        accuracy_task2 = correct[1] / total[1]
 
     print(f'accuracy of the {model}-model:')
     print(f'- task1: {accuracy_task1 * 100}%')
