@@ -332,7 +332,7 @@ class GPT(nn.Module):
 
 def inject_lora(model, lora_rank=4):
     config = LoraConfig(
-        r=rank,
+        r=lora_rank,
         lora_alpha=lora_rank,
         target_modules=["c_attn"],
         lora_dropout=0.0,
