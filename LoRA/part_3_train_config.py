@@ -55,12 +55,12 @@ def prepare_configs(device_type: str, has_logs: bool = True):
         # Experiment 5: rank ablation on Task A
         ('exp5_taskA_rank1',      'task_a',  1),
         ('exp5_taskA_rank2',      'task_a',  2),
-        ('exp5_taskA_rank4',      'task_a',  4),
+        #('exp5_taskA_rank4',      'task_a',  4),
         ('exp5_taskA_rank8',      'task_a',  8),
         ('exp5_taskA_rank16',     'task_a', 16),
         # Experiment 6: LoRA vs full fine-tuning
-        ('exp6_fullFT',           'task_a',  0),   # lora_rank=0 = full fine-tuning
-        ('exp6_lora_rank4',       'task_a',  4),
+        #('exp6_fullFT',           'task_a',  0),   # lora_rank=0 = full fine-tuning
+        #('exp6_lora_rank4',       'task_a',  4),
         ('exp6_lora_multitask',   'task_ab', 4),
     ]
 
