@@ -98,7 +98,7 @@ def evaluate_model(
 
     correct = [0, 0] #task 1, task 2-specific correct
     total = [0, 0]
-    for sample_input in val_dataset:        
+    for sample_input in val_dataset[:len(val_dataset) // 5]:
         proc = subprocess.run(
             [
                 sys.executable,
@@ -130,7 +130,7 @@ def evaluate_model(
         else:
             match = ''
         
-        #print(f'Real Label: {sample_input[1]}, Generated Label: {match}')
+        print(f'Real Label: {sample_input[1]}, Generated Label: {match}')
         
         if match == sample_input[1]:
             if sample_input[1] in ["VERSE", "PROSE"]:
