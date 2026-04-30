@@ -64,7 +64,7 @@ def prepare_configs(device_type: str, has_logs: bool = True):
         ('exp6_lora_multitask',   'task_ab', 4),
     ]
 
-    os.makedirs('LoRA/config', exist_ok=True)
+    os.makedirs('config', exist_ok=True) 
 
     for name, dataset, lora_rank in experiments_variants:
         new_content = re.sub(r'(dataset = ).*',   rf"\g<1>'{dataset}'",        file_content)
@@ -72,15 +72,15 @@ def prepare_configs(device_type: str, has_logs: bool = True):
         new_content = re.sub(r'(out_dir = )\S+',  rf"\g<1>'out/lora/{name}'",  new_content)
         new_content = re.sub(r'(wandb_run_name = ).*', rf"\g<1>'{name}'",      new_content)
 
-        with open(f'LoRA/config/training_{name}.py', 'w') as f:
+        with open(f'config/training_{name}.py', 'w') as f:
             f.write(new_content)
 
     if not has_logs:
         try:
-            os.makedirs('LoRA/logs', exist_ok=True)
+            os.makedirs('logs', exist_ok=True)
         except:
             print('folder either already exists or could not be created')
         finally:
             for name, _, _ in experiments_variants:
-                with open(f'LoRA/logs/{name}.log', 'w+') as f:
+                with open(f'logs/{name}.log', 'w+') as f:
                     pass
