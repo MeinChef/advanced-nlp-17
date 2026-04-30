@@ -76,7 +76,7 @@ if __name__ == "__main__":
                         os.path.dirname(__file__),
                         "nanoGPT",
                         "config",
-                        f"train-shakespeare-char-{model}"
+                        f"train-shakespeare-char-{model}.py"
                     )
                 ],
                 cwd = os.path.join(
