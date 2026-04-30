@@ -11,6 +11,11 @@ import torch
 if __name__ == "__main__":
     models = ['task1', 'task2', 'multi', 'char']
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    nanopath = os.path.join(
+        os.path.dirname(__file__),
+        "nanoGPT"
+    )
+
     # preparing the data
     for model in models:
         prepare_training(model)
@@ -19,7 +24,7 @@ if __name__ == "__main__":
     shutil.copy(
         src = os.path.join(
             os.path.dirname(__file__),
-            "sft"
+            "sft",
             "train_sft.py"
         ),
         dst = os.path.join(
@@ -60,6 +65,14 @@ if __name__ == "__main__":
         )
 
         # and copy the best model to that
+        os.makedirs(
+            os.path.join(
+                nanopath,
+                f"out-shakespeare-{cfg.name}"
+            ),
+            exist_ok = True
+        )
+
         shutil.copy(
             src = os.path.join(
                 os.path.dirname(__file__),
