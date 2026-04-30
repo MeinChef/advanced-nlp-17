@@ -14,6 +14,7 @@ from dataclasses import dataclass
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
+from peft import get_peft_model, LoraConfig
 
 class LayerNorm(nn.Module):
     """ LayerNorm but with an optional bias. PyTorch doesn't support simply bias=False """
@@ -26,26 +27,6 @@ class LayerNorm(nn.Module):
     def forward(self, input):
         return F.layer_norm(input, self.weight.shape, self.weight, self.bias, 1e-5)
 
-class LoRALinear(nn.Module):
-    def __init__(self, original_linear, rank=4):
-        super().__init__()
-        self.original = original_linear
-        self.original.weight.requires_grad = False  # freeze base weights
-        d_out, d_in = original_linear.weight.shape
-        self.A = nn.Parameter(torch.randn(rank, d_in)) 
-        self.B = nn.Parameter(torch.zeros(d_out, rank))  # B=0 → identity init
-
-    def forward(self, x):
-        return self.original(x) + (x @ self.A.T) @ self.B.T
-
-def freeze_base_params(model):
-    for name, param in model.named_parameters():
-        if '.A' not in name and '.B' not in name:
-            param.requires_grad = False
-
-def count_trainable(model):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
 class CausalSelfAttention(nn.Module):
 
     def __init__(self, config):
@@ -53,8 +34,6 @@ class CausalSelfAttention(nn.Module):
         assert config.n_embd % config.n_head == 0
         # key, query, value projections for all heads, but in a batch
         self.c_attn = nn.Linear(config.n_embd, 3 * config.n_embd, bias=config.bias)
-        if config.lora_rank > 0:
-            self.c_attn = LoRALinear(self.c_attn, rank=config.lora_rank)
         # output projection
         self.c_proj = nn.Linear(config.n_embd, config.n_embd, bias=config.bias)
         # regularization
@@ -136,7 +115,6 @@ class GPTConfig:
     n_embd: int = 768
     dropout: float = 0.0
     bias: bool = True # True: bias in Linears and LayerNorms, like GPT-2. False: a bit better and faster
-    lora_rank: int = 0  # 0 = no LoRA (full fine-tuning)
 
 class GPT(nn.Module):
 
@@ -162,10 +140,6 @@ class GPT(nn.Module):
 
         # init all weights
         self.apply(self._init_weights)
-        # re-zero all LoRA B matrices (apply() overwrites them)
-        for module in self.modules():
-            if isinstance(module, LoRALinear):
-                torch.nn.init.zeros_(module.B)
         # apply special scaled init to the residual projections, per GPT-2 paper
         for pn, p in self.named_parameters():
             if pn.endswith('c_proj.weight'):
@@ -356,3 +330,16 @@ class GPT(nn.Module):
 
         return idx
 
+def inject_lora(model, lora_rank=4):
+    config = LoraConfig(
+        r=rank,
+        lora_alpha=lora_rank,
+        target_modules=["c_attn"],
+        lora_dropout=0.0,
+        bias="none",
+    )
+    return get_peft_model(model, config)
+
+
+def count_trainable(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
