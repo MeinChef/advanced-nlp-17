@@ -208,3 +208,4 @@ __marimo__/
 
 # don't add the cloned nanoGPT repository
 nanoGPT/
+input.txt
