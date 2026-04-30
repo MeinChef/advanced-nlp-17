@@ -2,7 +2,7 @@ import part_3_train_config
 import part_3_training
 
 # ── Step 1: Prepare config files for all LoRA experiments ──────────────────
-part_3_config.prepare_configs(device_type='cuda', has_logs=False)
+part_3_train_config.prepare_configs(device_type='cuda', has_logs=False)
 
 # ── Step 2: Run all experiments ────────────────────────────────────────────
 
