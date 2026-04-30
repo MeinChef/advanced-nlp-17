@@ -104,7 +104,7 @@ def evaluate_model(
                 sys.executable,
                 "-m",
                 "sample",
-                f"--out_dir=out-shakespeare_{model}",
+                f"--out_dir=out-shakespeare-{model}",
                 "--num_samples=1",
                 f"--device={device}",
                 "--max_new_tokens=30",
