@@ -161,7 +161,8 @@ def evaluate_model(
     with open(
         os.path.join(
             os.path.dirname(__file__), 
-            'part_2_logs',
+            'logs',
+            f'out-shakespeare-{model}',
             'accuracies.log'
             ), 
             'a+'
