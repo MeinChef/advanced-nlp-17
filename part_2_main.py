@@ -54,7 +54,9 @@ if __name__ == "__main__":
                 "ckpt.pt"
             ),
             dst = os.path.join(
-                current_outpath,
+                os.path.dirname(__file__),
+                "nanoGPT",
+                f"out-shakespeare-{cfg.name}",
                 "ckpt.pt"
             )
         )
