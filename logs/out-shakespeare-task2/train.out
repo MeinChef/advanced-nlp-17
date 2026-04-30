@@ -1,7 +1,7 @@
-Overriding config with C:\VS-CODE-UNI-OS\advanced-nlp-17\nanoGPT\config\train-shakespeare-char-task1.py:
+Overriding config with C:\VS-CODE-UNI-OS\advanced-nlp-17\nanoGPT\config\train-shakespeare-char-task2.py:
 
 # Baseline configuration
-out_dir = 'out-shakespeare-task1'
+out_dir = 'out-shakespeare-task2'
 eval_interval = 200
 eval_iters = 50
 log_interval = 10
@@ -10,7 +10,7 @@ init_from = 'resume'
 wandb_log = False
 wandb_project = 'nanoGPT-assignment'
 wandb_run_name = 'baseline'
-dataset = 'shakespeare_task1'
+dataset = 'shakespeare_task2'
 gradient_accumulation_steps = 1
 batch_size = 64
 block_size = 256
@@ -29,14 +29,14 @@ device = 'cuda'
 compile = False 
 
 tokens per iteration will be: 16,384
-found vocab_size = 68 (inside data\shakespeare_task1\meta.pkl)
-Resuming training from out-shakespeare-task1
+found vocab_size = 68 (inside data\shakespeare_task2\meta.pkl)
+Resuming training from out-shakespeare-task2
 number of parameters: 6250240
 resize_token_embeddings: vocab 65 -> 69 (added 4 special token(s): ['@', '|', '<', '>'])
 num decayed parameter tensors: 22, with 6,248,000 parameters
 num non-decayed parameter tensors: 11, with 3,520 parameters
 using fused AdamW: True
 Vocab size changed, skipping optimizer state load
-step 7600: train loss 7.5691, val loss 7.5758
-saving checkpoint to out-shakespeare-task1
-iter 7600: loss 6.9829, time 1056.57ms, mfu -100.00%
+step 7600: train loss 7.7682, val loss 7.7602
+saving checkpoint to out-shakespeare-task2
+iter 7600: loss 7.1809, time 1061.72ms, mfu -100.00%
