@@ -6,6 +6,7 @@ import os
 import subprocess
 import sys
 import torch
+import time
 
 
 if __name__ == "__main__":
@@ -37,13 +38,14 @@ if __name__ == "__main__":
     # train the models
     # COMPUTATIONALLY EXPENSIVE
     for model in models:
+        now = time.time()
         cfg = GPTConfiguration(
             n_layer = 5,
             n_head = 5,
             n_embed = 320,
             eval_iters = 50,
-            eval_interval = 50, 
-            max_iters = 250,
+            eval_interval = 200, 
+            max_iters = 2500,
             save_checkpoints = True,
 
             init_from = "resume",
@@ -128,3 +130,4 @@ if __name__ == "__main__":
             model = model,
             device = device
         )
+        print(f"Done with model {model}! Took only like {time.time()-now}s")
