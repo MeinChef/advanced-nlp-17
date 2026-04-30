@@ -11,7 +11,7 @@ import torch
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.distributed import init_process_group, destroy_process_group
 
-from model import GPTConfig, GPT, freeze_base_params, count_trainable
+from model import GPT, GPTConfig, inject_lora, count_trainable
 
 # -----------------------------------------------------------------------------
 # I/O
@@ -154,7 +154,8 @@ else:
 # freeze base params if using LoRA
 # -----------------------------------------------------------------------------
 if lora_rank > 0:
-    freeze_base_params(model)
+    model = GPT(GPTConfig(**model_args))
+    model = inject_lora(model, lora_rank=lora_rank)
     print(f"LoRA mode: rank={lora_rank}, trainable params={count_trainable(model):,}")
 else:
     print(f"Full fine-tuning mode, trainable params={count_trainable(model):,}")
