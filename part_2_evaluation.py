@@ -99,6 +99,9 @@ def evaluate_model(
     correct = [0, 0] #task 1, task 2-specific correct
     total = [0, 0]
     for sample_input in val_dataset[:len(val_dataset) // 5]:
+        if not sample_input[0] or not sample_input[1]:
+            continue
+        
         proc = subprocess.run(
             [
                 sys.executable,
