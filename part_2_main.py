@@ -45,7 +45,7 @@ if __name__ == "__main__":
             n_embed = 320,
             eval_iters = 50,
             eval_interval = 200, 
-            max_iters = 2500,
+            max_iters = 7600 + 2500, # starts at the last checkpoint from previous
             save_checkpoints = True,
 
             init_from = "resume",
