@@ -4,6 +4,7 @@ import pickle
 import re
 import sys
 import subprocess
+from sft.sample import TextGenerator
 
 def decode_val_bin(
         val_bin_path, 
@@ -96,31 +97,50 @@ def evaluate_model(
     else:
         val_dataset = val_preprocessed_dataset
 
+    # init GPT-Model because subprocess is very overhead-y
+    generator = TextGenerator(
+        out_dir = os.path.join(
+            os.path.dirname(__file__),
+            "nanoGPT",
+            f"out-shakespeare-{model}"
+        ),
+        device = device
+    )
+    print(f"using path: {os.path.join(
+            os.path.dirname(__file__),
+            "nanoGPT",
+            f"out-shakespeare-{model}"
+        )}")
+
     correct = [0, 0] #task 1, task 2-specific correct
     total = [0, 0]
     for sample_input in val_dataset[:len(val_dataset) // 5]:
         if not sample_input[0] or not sample_input[1]:
             continue
         
-        proc = subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "sample",
-                f"--out_dir=out-shakespeare-{model}",
-                "--num_samples=1",
-                f"--device={device}",
-                "--max_new_tokens=30",
-                f"--start='{sample_input[0]}'"
-            ],
-            cwd = os.path.join(
-                os.path.dirname(__file__),
-                "nanoGPT"
-            ),
-            encoding = "utf-8",
-            stdout = subprocess.PIPE
+        terminal_output = generator.generate(
+            sample_input[0],
+            max_new_tokens = 30
         )
-        terminal_output = proc.stdout
+        # proc = subprocess.run(
+        #     [
+        #         sys.executable,
+        #         "-m",
+        #         "sample",
+        #         f"--out_dir=out-shakespeare-{model}",
+        #         "--num_samples=1",
+        #         f"--device={device}",
+        #         "--max_new_tokens=30",
+        #         f"--start='{sample_input[0]}'"
+        #     ],
+        #     cwd = os.path.join(
+        #         os.path.dirname(__file__),
+        #         "nanoGPT"
+        #     ),
+        #     encoding = "utf-8",
+        #     stdout = subprocess.PIPE
+        # )
+        # terminal_output = proc.stdout
 
         match = re.search(
             r'<\s*([A-Z_]+)\s*>',
