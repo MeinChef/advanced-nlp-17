@@ -44,9 +44,9 @@ if __name__ == "__main__":
             n_head = 5,
             n_embed = 320,
             eval_iters = 50,
-            eval_interval = 200, 
+            eval_interval = 50, 
             max_iters = 7600 + 2500, # starts at the last checkpoint from previous
-            save_checkpoints = True,
+            save_checkpoints = False,
 
             init_from = "resume",
             lr = 1e-3 if model == "char" else 1e-4,
