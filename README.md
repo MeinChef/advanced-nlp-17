@@ -32,19 +32,21 @@ And execute setup script
 python setup.py
 ```
 
-If you have a **blackwell-series GPU**, which is not yet supported by the stable torch, you might need to install the nightly torch version. 
+If you have a **blackwell-series GPU**, which is not yet supported by the stable torch, you might need to install the [nightly torch version](https://pytorch.org/get-started/locally/). 
 The setup script informs you in the last couple of lines if that is applicable for you.
+We used the following command:
 ```bash
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu129
 ```
 
-You should be all set to execute the main programs for each task!
+You should now be all set to execute the main programs for each task!
 
 ---
 
-# Task 1
+# Task 1 (Pre-Training)
 Task one was concerned with investigating scaling laws (Hoffman et al., 2022, https://doi.org/10.48550/arXiv.2203.15556).
-For this we trained four models on each of the four partial datasets.
+For this we trained four models on fractions of the shakespeare-char dataset provided by nanoGPT.
+Each model was trained on all dataset fractions.
 |    | Layers | Heads | Embedding  | Params     | Dataset-Parts |
 |----|--------|-------|------------|-----------:|---------------|
 | XS | 2      | 2     | 64*2 = 128 |    119.168 | 0.125         |
@@ -65,8 +67,34 @@ python chinchilla.py
 ```
 and the visualisations in the aforementioned Jupyter Notebook.
 
-# Task 2
-TODO
+# Task 2 (Supervised Fine-Tuning)
+For Task two we pre-processed the full dataset for speaker prediction and prose/verse classification.
+We then fine-tuned our best model (M trained on the full dataset) on these datasets for each individual task and for both.
+For that we needed to add our special tokens to the embedding layer.
+
+To run this task, run the following:
+```bash
+python part_2_main.py
+```
+
+### Speaker Prediction
+Each speaker (in UPPERCASE) gets replaced with the token `@`, and after the lines the speaker spoke, we place the solution in `<>`.
+
+An example would look like this:
+> @:    
+> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ... \<ROMEO\>
+
+### Prose/Verse Classification
+Our heuristic for classifying whether the block of text is prose or a verse, we used vowels (or syllables).
+If each line in the block was roughly $10\pm3$ syllables, it's a verse, else it's prose.
+As an indicator that this is a classification task, we used the `|` symbol, and `<>` to embed the answer.
+
+An example would look like this:
+> ROMEO:
+> Lorem ipsum dolor sit amet
+> consectetur adipiscing elit
+> sed do eiusmod tempor incididunt | <VERSE>
+
 
 # Task 3
 TODO
