@@ -8,3 +8,5 @@ tqdm
 matplotlib
 adjustText
 peft
+seaborn
+adjustText
