@@ -90,10 +90,10 @@ If each line in the block was roughly $10\pm3$ syllables, it's a verse, else it'
 As an indicator that this is a classification task, we used the `|` symbol, and `<>` to embed the answer.
 
 An example would look like this:
-> ROMEO:
-> Lorem ipsum dolor sit amet
-> consectetur adipiscing elit
-> sed do eiusmod tempor incididunt | <VERSE>
+> ROMEO:    
+> Lorem ipsum dolor sit amet    
+> consectetur adipiscing elit    
+> sed do eiusmod tempor incididunt | \<VERSE>
 
 
 # Task 3
