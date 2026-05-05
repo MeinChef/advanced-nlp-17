@@ -106,8 +106,8 @@ def evaluate_model(
     )
     print(f"using path: {os.path.join(
             os.path.dirname(__file__),
-            "nanoGPT",
-            f"out-shakespeare-{model}"
+            'nanoGPT',
+            f'out-shakespeare-{model}'
         )}")
 
     correct = [0, 0] #task 1, task 2-specific correct
