@@ -13,11 +13,11 @@ part_3_training.train('exp4_taskB_rank4')
 # Experiment 5: Rank ablation on Task A
 part_3_training.train('exp5_taskA_rank1')
 part_3_training.train('exp5_taskA_rank2')
-part_3_training.train('exp5_taskA_rank4')
+# part_3_training.train('exp5_taskA_rank4')
 part_3_training.train('exp5_taskA_rank8')
 part_3_training.train('exp5_taskA_rank16')
 
 # Experiment 6: LoRA vs full fine-tuning
-part_3_training.train('exp6_fullFT')
-part_3_training.train('exp6_lora_rank4')
+# part_3_training.train('exp6_fullFT')
+# part_3_training.train('exp6_lora_rank4')
 part_3_training.train('exp6_lora_multitask')
