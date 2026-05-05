@@ -158,6 +158,7 @@ if init_from == 'scratch':
     model_args['vocab_size'] = meta_vocab_size if meta_vocab_size is not None else 50304
     gptconf = GPTConfig(**model_args)
     model = GPT(gptconf)
+    NUM_SPECIAL_TOKENS = 0
 elif init_from == 'resume':
     print(f"Resuming training from {out_dir}")
     # resume training from a checkpoint.
@@ -201,7 +202,6 @@ if block_size < model.config.block_size:
 # Here the fancy stuff happens - first resizing of the embeddings
 # needed for all sft tasks, be it with LoRA or without.
 # ---------------------------------------------------------------------------
-
 model, model_args['vocab_size'] = resize_token_embeddings(model, NUM_SPECIAL_TOKENS)
 
 # then if we need LoRA
