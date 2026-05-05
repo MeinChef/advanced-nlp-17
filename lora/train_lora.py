@@ -11,7 +11,7 @@ import torch
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.distributed import init_process_group, destroy_process_group
 
-from model import GPT, GPTConfig, inject_lora, count_trainable
+from model_lora import GPTConfig, GPT, freeze_base_params, count_trainable
 
 # -----------------------------------------------------------------------------
 # I/O
