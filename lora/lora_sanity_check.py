@@ -1,5 +1,5 @@
 import torch
-from model import GPT, GPTConfig, freeze_base_params, count_trainable
+from model_lora import GPT, GPTConfig, freeze_base_params, count_trainable
 
 # Load the same checkpoint for both models
 ckpt = torch.load('nanoGPT/out-shakespeare-5-320-1/ckpt.pt', map_location='cuda' if torch.cuda.is_available() else 'cpu')

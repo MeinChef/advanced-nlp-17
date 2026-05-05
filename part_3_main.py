@@ -58,6 +58,17 @@ if __name__ == "__main__":
             "train_lora.py"
         )
     )
+    shutil.copy(
+        src = os.path.join(
+            os.path.dirname(__file__),
+            "lora",
+            "model_lora.py"
+        ),
+        dst = os.path.join(
+            nanopath,
+            "model_lora.py"
+        )
+    )
 
     # experiments woop woop
     for exp in experiments:
