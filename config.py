@@ -18,7 +18,7 @@ class GPTConfiguration:
     batch_size: int = 64
     max_iters: int = 5000
     warmup_iters: int = 200
-    lora_rank: int = 4
+    lora_rank: int = 0
     save_checkpoints: bool = False
     init_from: str = "scratch"
     device: str = "cpu"
