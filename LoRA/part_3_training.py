@@ -53,7 +53,8 @@ def train(experiment: str):
             rootpth,
             "logs",
             f"out-lora-{experiment}"
-        )
+        ),
+        exist_ok = True
     )
 
     # Get the LoRA directory (where this script is)
