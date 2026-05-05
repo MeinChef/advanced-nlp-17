@@ -60,10 +60,11 @@ if __name__ == "__main__":
             init_from = "resume",
             name = exp
         )
+        print(exp)
         cfg.set_backend()
         cfg.set_compile()
         cfg.write(
-            basepath = os.path.dirname(__file__)
+            basepath = nanopath
         )
 
         # create log dir
