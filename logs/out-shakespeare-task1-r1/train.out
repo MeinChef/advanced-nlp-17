@@ -1,0 +1,60 @@
+Overriding config with C:\VS-CODE-UNI-OS\advanced-nlp-17\nanoGPT\config\train-shakespeare-char-task1-r1.py:
+
+# Baseline configuration
+out_dir = 'out-shakespeare-task1-r1'
+eval_interval = 50
+eval_iters = 50
+log_interval = 10
+always_save_checkpoint = False
+init_from = 'resume'
+wandb_log = False
+wandb_project = 'nanoGPT-assignment'
+wandb_run_name = 'baseline'
+dataset = 'shakespeare_task1'
+gradient_accumulation_steps = 1
+batch_size = 64
+block_size = 256
+n_layer = 5
+n_head = 5
+n_embd = 320
+dropout = 0.2
+learning_rate = 0.001
+max_iters = 9600
+lr_decay_iters = 100
+min_lr = 1e-4
+beta2 = 0.99
+lora_rank = 1
+warmup_iters = 200
+weight_decay = 1e-1
+device = 'cuda'
+compile = False 
+
+tokens per iteration will be: 16,384
+found vocab_size = 68 (inside data\shakespeare_task1\meta.pkl)
+Resuming training from out-shakespeare-task1-r1
+number of parameters: 6250240
+resize_token_embeddings: vocab 65 -> 69 (added 4 special token(s): ['@', '|', '<', '>'])
+number of parameters: 6251520
+LoRA mode: rank=1, trainable params=6,400
+num decayed parameter tensors: 10, with 6,400 parameters
+num non-decayed parameter tensors: 0, with 0 parameters
+using fused AdamW: True
+Vocab size changed, skipping optimizer state load
+step 7600: train loss 4.3613, val loss 4.3629
+saving checkpoint to out-shakespeare-task1-r1
+iter 7600: loss 4.3315, time 1151.28ms, mfu -100.00%
+iter 7610: loss 4.3207, time 3.53ms, mfu 62.51%
+iter 7620: loss 4.3294, time 15.30ms, mfu 57.70%
+iter 7630: loss 4.3129, time 15.42ms, mfu 53.36%
+iter 7640: loss 4.3146, time 16.07ms, mfu 49.39%
+step 7650: train loss 4.3232, val loss 4.3227
+saving checkpoint to out-shakespeare-task1-r1
+iter 7650: loss 4.3046, time 858.21ms, mfu 44.48%
+iter 7660: loss 4.2994, time 17.90ms, mfu 41.26%
+iter 7670: loss 4.2706, time 15.42ms, mfu 38.57%
+iter 7680: loss 4.2626, time 15.37ms, mfu 36.14%
+iter 7690: loss 4.2444, time 15.53ms, mfu 33.95%
+step 7700: train loss 4.1877, val loss 4.1870
+saving checkpoint to out-shakespeare-task1-r1
+iter 7700: loss 4.2081, time 866.31ms, mfu 30.58%
+iter 7710: loss 4.1936, time 24.31ms, mfu 28.43%
