@@ -1,5 +1,89 @@
-from peft import get_peft_model, LoraConfig
+import os
+import shutil
+import numpy as np
 import torch
+from peft import get_peft_model, LoraConfig
+
+
+def prep_data_sub(
+    basepath: str = "nanoGPT",
+    split: float = 0.5,
+) -> None:
+    if split < 0 or split > 1:
+        raise ValueError(
+            "Split is outside of range 0-1. Please fix that.\n" +
+            f"Actual Value: {split}"
+        )
+
+    # check if subset already exists
+    if os.path.exists(
+        os.path.join(
+            basepath,
+            "data",
+            "shakespeare_char",
+            f"train-{int(split * 100)}.bin"
+        )
+    ):
+        print(f"A split of {split} already exists, not creating another one.")
+        return
+
+    # load
+    data = np.memmap(
+        os.path.join(
+            basepath,
+            "data",
+            "shakespeare_char",
+            "train-orig.bin"
+        ), 
+        dtype = np.uint16, 
+        mode = "r"
+    )
+
+    # subset and save
+    data_subset = data[:int(len(data) * split)]
+    data_subset.tofile(
+        os.path.join(
+            basepath,
+            "data",
+            "shakespeare_char",
+            f"train-{int(split * 100)}.bin"
+        )
+    )
+
+
+def use_subset(
+    basepath: str,
+    split: float | int = 0.5
+) -> None:
+    
+    # check if split is in a valid range
+    if split > 0 and split <= 1:
+        id = int(split * 100)
+    elif split > 0 and split <= 100 and isinstance(split, int):
+        id = split
+    else:
+        raise ValueError("Split is not in range ]0,1] or ]0,100] (and int).")
+
+    if os.path.exists(
+        os.path.join(basepath, "train.bin")
+    ):
+        # remove the train.bin first
+        os.remove(
+            os.path.join(basepath, "train.bin")
+        )
+
+    # aaaand copy
+    shutil.copyfile(
+        src = os.path.join(
+            basepath,
+            f"train-{id}.bin"
+        ),
+        dst = os.path.join(
+            basepath,
+            "train.bin"
+        )
+    )
+
 
 SPECIAL_TOKENS = ['@', '|', '<', '>']
 NUM_SPECIAL_TOKENS = len(SPECIAL_TOKENS)  # 4
