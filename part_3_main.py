@@ -53,14 +53,13 @@ if __name__ == "__main__":
         # configuration
         cfg = GPTConfiguration(
             max_iters = 7600 + 2000,
-            lora_rank = int(exp[7:]),           # everything after -r
+            lora_rank = 0, # int(exp[7:]),           # everything after -r
             lr = 1e-4,
             save_checkpoints = False,
             dataset = f"shakespeare_{exp[:5]}", # tasknames are all 5 long
             init_from = "resume",
             name = exp
         )
-        print(exp)
         cfg.set_backend()
         cfg.set_compile()
         cfg.write(
