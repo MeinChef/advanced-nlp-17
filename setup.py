@@ -32,12 +32,13 @@ if __name__ == "__main__":
         raise EnvironmentError()
     
     print("Starting Setup...")
-    if not os.path.exists(
-        os.path.join(
-            os.path.dirname(__file__),
-            "nanoGPT"
-        )
-    ):
+    
+    nanopath = os.path.join(
+        os.path.dirname(__file__),
+        "nanoGPT"
+    )
+
+    if not os.path.exists(nanopath):
         print("Cloning the nanoGPT repository...")
         subprocess.check_call(
             [
@@ -101,8 +102,7 @@ if __name__ == "__main__":
     print("Done!")
 
     datapath =  os.path.join(
-        os.path.dirname(__file__),
-        "nanoGPT",
+        nanopath,
         "data",
         "shakespeare_char"
     )
@@ -133,14 +133,12 @@ if __name__ == "__main__":
     print("Editing nanoGPT/model.py to report exact model parameters...")
     if os.path.exists(
         os.path.join(
-            os.path.dirname(__file__),
-            "nanoGPT",
+            nanopath,
             "model.py"
         )
     ):
         filepth = os.path.join(
-            os.path.dirname(__file__),
-            "nanoGPT",
+            nanopath,
             "model.py"
         )
 
@@ -163,6 +161,40 @@ if __name__ == "__main__":
         print("Succesfully edited model.py!")
     else:
         print("Could not find model.py. Skipping ...")
+
+    if os.path.exists(nanopath):
+        print("Copying files to nanoGPT repository...")
+        
+        shutil.copy(
+            src = os.path.join(
+                os.path.dirname(__file__),
+                "sft",
+                "train_sft.py"
+            ),
+            dst = os.path.join(
+                nanopath,
+                "train_sft.py"
+            )
+        )
+        print("Copied sft/train_sft.py.")
+
+        shutil.copy(
+            src = os.path.join(
+                os.path.dirname(__file__),
+                "sft",
+                "helper.py"
+            ),
+            dst = os.path.join(
+                nanopath,
+                "helper.py"
+            )
+        )        
+        print("Copied sft/helper.py.")
+    
+    else:
+        print("Failed to find the nanoGPT repository.")
+        print("Could not copy src/train_sft.py and src/helper.py to nanoGPT/.")
+
 
     if blackwell:
         print("Torch installation for Blackwell-series GPUs not possoble in script, please refer to: [link to documentation].")
