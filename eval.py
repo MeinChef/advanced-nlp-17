@@ -2,8 +2,6 @@ import numpy as np
 import os
 import pickle
 import re
-import sys
-import subprocess
 from sft.sample import TextGenerator
 
 def decode_val_bin(
