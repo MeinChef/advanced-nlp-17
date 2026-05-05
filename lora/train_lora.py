@@ -163,7 +163,7 @@ else:
 model.to(device)
 
 # GradScaler
-scaler = torch.cuda.amp.GradScaler(enabled=(dtype == 'float16'))
+scaler = torch.amp.GradScaler('cuda', enabled=(dtype == 'float16'))
 
 # optimizer (configure_optimizers filters by requires_grad internally)
 optimizer = model.configure_optimizers(weight_decay, learning_rate, (beta1, beta2), device_type)
