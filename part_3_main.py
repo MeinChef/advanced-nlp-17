@@ -26,23 +26,23 @@ if __name__ == "__main__":
     shutil.copy(
         src = os.path.join(
             os.path.dirname(__file__),
-            "lora",
-            "train_lora.py"
+            "sft",
+            "helper.py"
         ),
         dst = os.path.join(
             nanopath,
-            "train_lora.py"
+            "helper.py"
         )
     )
     shutil.copy(
         src = os.path.join(
             os.path.dirname(__file__),
-            "lora",
-            "model_lora.py"
+            "sft",
+            "train_sft.py"
         ),
         dst = os.path.join(
             nanopath,
-            "model_lora.py"
+            "train_sft.py"
         )
     )
 
@@ -110,17 +110,14 @@ if __name__ == "__main__":
                 [
                     sys.executable,
                     "-m",
-                    "train",
+                    "train_sft",
                     os.path.join(
                         nanopath,
                         "config",
                         f"train-shakespeare-char-{cfg.name}.py"
                     )
                 ],
-                cwd = os.path.join(
-                    os.path.dirname(__file__), 
-                    "nanoGPT"
-                ),
+                cwd = nanopath,
                 text = True,
                 encoding = "utf-8",
                 stdout = log,
@@ -128,7 +125,7 @@ if __name__ == "__main__":
             )
 
         evaluate_model(
-            model = exp,
+            model = exp[:5],
             device = cfg.device
         )
         print(f"Done with model {exp}! Took only like {time.time()-now}s")
