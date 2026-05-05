@@ -104,11 +104,13 @@ def evaluate_model(
         ),
         device = device
     )
-    print(f"using path: {os.path.join(
+    print("Using path: ",
+        os.path.join(
             os.path.dirname(__file__),
             'nanoGPT',
             f'out-shakespeare-{model}'
-        )}")
+        )
+    )
 
     correct = [0, 0] #task 1, task 2-specific correct
     total = [0, 0]
