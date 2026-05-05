@@ -1,6 +1,7 @@
 import os
 import sys
 import math
+import time
 import shutil
 import subprocess
 from argparse import ArgumentParser
@@ -54,6 +55,7 @@ def main(task: str) -> None:
 
 
     for model in todos:
+        then = time.time()
         if task == "pre":
             # unpack
             model_config, data_subset = model
@@ -205,6 +207,9 @@ def main(task: str) -> None:
                 model = model[:5],                  # type: ignore
                 device = cfg.device
             )
+
+        print(f"Succesfully trained model {model}!")
+        print(f"Wall Time: {round(time.time() - then, 4)}s")
 
 
 
