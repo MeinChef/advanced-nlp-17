@@ -28,6 +28,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.distributed import init_process_group, destroy_process_group
 
 from model import GPTConfig, GPT
+from helper import inject_lora, count_trainable, resize_token_embeddings, NUM_SPECIAL_TOKENS
 
 # -----------------------------------------------------------------------------
 # default config values designed to train a gpt2 (124M) on OpenWebText
@@ -54,6 +55,8 @@ n_head = 12
 n_embd = 768
 dropout = 0.0 # for pretraining 0 is good, for finetuning try 0.1+
 bias = False # do we use bias inside LayerNorm and Linear layers?
+# LoRA
+lora_rank = 0
 # adamw optimizer
 learning_rate = 6e-4 # max learning rate
 max_iters = 600000 # total number of training iterations
@@ -177,6 +180,7 @@ elif init_from == 'resume':
             state_dict[k[len(unwanted_prefix):]] = state_dict.pop(k)
     model.load_state_dict(state_dict)
     iter_num = checkpoint['iter_num']
+    # since we're doing fine-tuning we always want the trained model to be safed at least once
     # best_val_loss = checkpoint['best_val_loss']
 elif init_from.startswith('gpt2'):
     print(f"Initializing from OpenAI GPT-2 weights: {init_from}")
@@ -191,72 +195,25 @@ if block_size < model.config.block_size:
     model.crop_block_size(block_size)
     model_args['block_size'] = block_size # so that the checkpoint will have the right value
 
+#############################################################################
+# The major edits in this file.
+# 
+# Here the fancy stuff happens - first resizing of the embeddings
+# needed for all sft tasks, be it with LoRA or without.
 # ---------------------------------------------------------------------------
-# Special tokens: @  |  <  >
-# We add 4 new tokens to the vocabulary and resize the embedding + lm_head
-# to accommodate them.  New rows are initialised from the mean of the
-# existing embeddings so the model starts in a reasonable region of weight
-# space rather than at zero or pure noise.
+
+model, model_args['vocab_size'] = resize_token_embeddings(model, NUM_SPECIAL_TOKENS)
+
+# then if we need LoRA
+if lora_rank > 0:
+    model = GPT(GPTConfig(**model_args))
+    model = inject_lora(model, lora_rank = lora_rank)
+    print(f"LoRA mode: rank={lora_rank}, trainable params={count_trainable(model):,}")
+else:
+    print(f"Full fine-tuning mode, trainable params={count_trainable(model):,}")
+
 # ---------------------------------------------------------------------------
-SPECIAL_TOKENS = ['@', '|', '<', '>']
-NUM_SPECIAL_TOKENS = len(SPECIAL_TOKENS)  # 4
-
-def resize_token_embeddings(model, num_new_tokens: int) -> None:
-    """Extend token embeddings and the tied lm_head weight by *num_new_tokens*.
-
-    Both ``model.transformer.wte`` (the input embedding) and
-    ``model.lm_head`` (the output projection that shares its weight with wte
-    in standard GPT-2) are resized in-place.  New rows are initialised with
-    the mean of the existing embedding rows so that the new tokens start in a
-    plausible region of weight space.
-
-    Args:
-        model: A ``GPT`` instance (unwrapped from DDP if applicable).
-        num_new_tokens: Number of additional vocabulary entries to add.
-    """
-    if num_new_tokens <= 0:
-        return
-
-    old_vocab_size = model.config.vocab_size
-    new_vocab_size = old_vocab_size + num_new_tokens
-
-    # --- input embedding (wte) -------------------------------------------
-    old_wte = model.transformer.wte  # nn.Embedding
-    old_weight = old_wte.weight.data  # (old_vocab, n_embd)
-
-    new_wte = torch.nn.Embedding(new_vocab_size, old_wte.embedding_dim)
-    new_wte.to(device=old_weight.device, dtype=old_weight.dtype)
-
-    # copy existing weights
-    new_wte.weight.data[:old_vocab_size] = old_weight
-    # initialise new rows with the mean of existing embeddings
-    mean_embedding = old_weight.mean(dim=0, keepdim=True)  # (1, n_embd)
-    new_wte.weight.data[old_vocab_size:] = mean_embedding.expand(num_new_tokens, -1)
-
-    model.transformer.wte = new_wte
-
-    # --- output projection (lm_head) -------------------------------------
-    # In nanoGPT lm_head is an nn.Linear(n_embd, vocab_size, bias=False)
-    # whose .weight is *tied* to wte.weight at forward time.  We replace the
-    # Linear layer and re-tie the weights so the parameter is shared exactly
-    # as in the original architecture.
-    old_lm_head = model.lm_head  # nn.Linear
-    new_lm_head = torch.nn.Linear(old_lm_head.in_features, new_vocab_size, bias=False)
-    new_lm_head.to(device=old_lm_head.weight.device, dtype=old_lm_head.weight.dtype)
-
-    new_lm_head.weight = model.transformer.wte.weight  # tie weights
-
-    model.lm_head = new_lm_head
-
-    # --- update config so checkpoints reflect the new vocab size ----------
-    model.config.vocab_size = new_vocab_size
-    model_args['vocab_size'] = new_vocab_size
-
-    print(f"resize_token_embeddings: vocab {old_vocab_size} -> {new_vocab_size} "
-          f"(added {num_new_tokens} special token(s): {SPECIAL_TOKENS})")
-
-resize_token_embeddings(model, NUM_SPECIAL_TOKENS)
-# ---------------------------------------------------------------------------
+#############################################################################
 
 model.to(device)
 
