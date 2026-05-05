@@ -2,6 +2,7 @@ import os
 import subprocess
 import sys
 from datetime import datetime
+from pathlib import Path
 
 def train(experiment: str):
     """
@@ -37,14 +38,35 @@ def train(experiment: str):
         print(f"'{experiment}' is not a supported experiment. Choose from: {valid_experiments}")
         return
 
+    rootpth = Path(os.path.dirname(__file__),).parent
+
     # Ensure logs directory exists
-    os.makedirs('logs', exist_ok=True)
+    os.makedirs(
+        os.path.join(
+            rootpth,
+            "logs"
+        ), 
+        exist_ok = True
+    )
+    os.makedirs(
+        os.path.join(
+            rootpth,
+            "logs",
+            f"out-lora-{experiment}"
+        )
+    )
 
     # Get the LoRA directory (where this script is)
     lora_dir = os.path.dirname(os.path.abspath(__file__))
 
+    
     # Run training with timestamp logging (Windows-compatible)
-    log_file = f'LoRA/logs/{experiment}.log'
+    log_file = os.path.join(
+        rootpth,
+        "logs",
+        f"out-lora-{experiment}",
+        f"{experiment}.out"
+    )
     try:
         with open(log_file, 'w+') as log:
             process = subprocess.Popen(
