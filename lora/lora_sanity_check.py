@@ -1,9 +1,5 @@
-from model import GPT, GPTConfig, inject_lora, count_trainable
+from model_lora import GPT, GPTConfig, inject_lora, count_trainable
 import torch
-<<<<<<< HEAD:lora/lora_sanity_check.py
-from model_lora import GPT, GPTConfig, freeze_base_params, count_trainable
-=======
->>>>>>> lora:LoRA/lora_sanity_check.py
 
 # Basismodell
 model_base = GPT(GPTConfig())
