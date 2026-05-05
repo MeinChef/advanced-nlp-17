@@ -1,25 +1,19 @@
+from model import GPT, GPTConfig, inject_lora, count_trainable
 import torch
+<<<<<<< HEAD:lora/lora_sanity_check.py
 from model_lora import GPT, GPTConfig, freeze_base_params, count_trainable
+=======
+>>>>>>> lora:LoRA/lora_sanity_check.py
 
-# Load the same checkpoint for both models
-ckpt = torch.load('nanoGPT/out-shakespeare-5-320-1/ckpt.pt', map_location='cuda' if torch.cuda.is_available() else 'cpu')
+# Basismodell
+model_base = GPT(GPTConfig())
+model_base.eval()
 
-# Load with LoRA
-config_lora = GPTConfig(**{**ckpt['model_args'], 'lora_rank': 4})
-model_lora = GPT(config_lora)
-
-state_dict = ckpt['model']
-remapped = {}
-for k, v in state_dict.items():
-    if 'c_attn.weight' in k:
-        remapped[k.replace('c_attn.weight', 'c_attn.original.weight')] = v
-    elif 'c_attn.bias' in k:
-        remapped[k.replace('c_attn.bias', 'c_attn.original.bias')] = v
-    else:
-        remapped[k] = v
-model_lora.load_state_dict(remapped, strict=False)
-
-freeze_base_params(model_lora)
+# LoRA-Modell
+model_lora = GPT(GPTConfig())
+model_lora = inject_lora(model_lora, lora_rank=4)
+model_lora.load_state_dict(model_base.state_dict(), strict=False)
+model_lora.eval()
 
 # Check 1: only LoRA params are trainable
 print("=== Trainable parameters ===")
@@ -28,15 +22,13 @@ for name, param in model_lora.named_parameters():
         print(f"  {name}: {param.shape}")
 print(f"Total trainable: {count_trainable(model_lora)}")
 
-# Check 2: output is identical to model without LoRA (B=0 at init)
-config_base = GPTConfig(**{**ckpt['model_args'], 'lora_rank': 0})
-model_base = GPT(config_base)
-model_base.load_state_dict(ckpt['model'], strict=True)
+# Check 2: output identical to base model (B initialised to zero)
+x = torch.randint(0, GPTConfig().vocab_size, (1, 16))
 
-x = torch.randint(0, config_lora.vocab_size, (1, 32))
 with torch.no_grad():
-    out_lora, _ = model_lora(x)
     out_base, _ = model_base(x)
+    out_lora, _ = model_lora(x)
 
-print("\n=== Output identity check ===")
-print(f"Max diff: {(out_lora - out_base).abs().max().item()}")  # should be ~0.0
+max_difference = (out_base - out_lora).abs().max().item()
+print(f"\n=== Output difference ===")
+print(f"Max difference: {max_difference:.2e}")
