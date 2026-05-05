@@ -5,6 +5,7 @@ import random
 import os
 import pickle
 import requests
+from pathlib import Path
 
 def sft_prepare_task1(data):
     speakers = []
@@ -98,10 +99,29 @@ def prepare_training(task: str):
     Parameters:
         task (str): 4 choices
             'task1': trained for speaker identification
-            'task3': trained for verse vs prose identification
+            'task2': trained for verse vs prose identification
             'multi': trained for both at the same time
             'char': trained without any specific task
     """
+    # create directory
+    dirpath = os.path.join(
+        os.getcwd(),
+        "nanoGPT",
+        "data",
+        f"shakespeare_{task}"
+    )
+    os.makedirs(
+        dirpath,
+        exist_ok = True
+    )
+
+    if os.path.exists(os.path.join(dirpath, "train.bin")) and \
+        os.path.exists(os.path.join(dirpath, "val.bin")) and \
+        os.path.exists(os.path.join(dirpath, "meta.pkl")):
+            print(f"Dataset {task} already created. Skipping.")
+            return
+
+
     # download the tiny shakespeare dataset
     input_file_path = os.path.join(os.path.dirname(__file__), 'input.txt')
     if not os.path.exists(input_file_path):
@@ -124,7 +144,7 @@ def prepare_training(task: str):
         chars = sorted(list(set(data)))
     else:
         raise ValueError(
-            "Parameter 'task' not recognised. Expected 'task1', 'task2', 'multi', or 'pre'\n"
+            "Parameter 'task' not recognised. Expected 'task1', 'task2', 'multi', or 'char'\n"
             f"Got {task} instead"
         )
     
@@ -169,20 +189,7 @@ def prepare_training(task: str):
         'vocab_size': vocab_size,
         'itos': itos,
         'stoi': stoi,
-    }
-
-    # create directory
-    dirpath = os.path.join(
-        os.path.dirname(__file__),
-        "nanoGPT",
-        "data",
-        f"shakespeare_{task}"
-    )
-
-    os.makedirs(
-        dirpath,
-        exist_ok = True
-    )        
+    }     
 
     # save train and test
     train_ids.tofile(
