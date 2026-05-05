@@ -18,6 +18,7 @@ class GPTConfiguration:
     batch_size: int = 64
     max_iters: int = 5000
     warmup_iters: int = 200
+    lora_rank: int = 4
     save_checkpoints: bool = False
     init_from: str = "scratch"
     device: str = "cpu"
@@ -51,6 +52,7 @@ class GPTConfiguration:
             lr_decay_iters = 100
             min_lr = 1e-4
             beta2 = 0.99
+            lora_rank = {self.lora_rank}
             warmup_iters = {self.warmup_iters}
             weight_decay = 1e-1
             device = '{self.device}'
