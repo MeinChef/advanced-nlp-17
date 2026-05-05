@@ -46,7 +46,7 @@ def train(experiment: str):
     # Run training with timestamp logging (Windows-compatible)
     log_file = f'LoRA/logs/{experiment}.log'
     try:
-        with open(log_file, 'w') as log:
+        with open(log_file, 'w+') as log:
             process = subprocess.Popen(
                 [sys.executable, 'train_lora.py', f'LoRA/config/training_{experiment}.py'],
                 stdout=subprocess.PIPE,
