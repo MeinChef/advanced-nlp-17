@@ -6,22 +6,48 @@ import os
 import subprocess
 import sys
 import torch
+import time
 
 
 if __name__ == "__main__":
     models = ['task1', 'task2', 'multi', 'char']
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    nanopath = os.path.join(
+        os.path.dirname(__file__),
+        "nanoGPT"
+    )
+
     # preparing the data
     for model in models:
         prepare_training(model)
 
+    # move the custom training file to the nanoGPT folder
+    shutil.copy(
+        src = os.path.join(
+            os.path.dirname(__file__),
+            "sft",
+            "train_sft.py"
+        ),
+        dst = os.path.join(
+            os.path.dirname(__file__),
+            "nanoGPT",
+            "train_sft.py"
+        )
+    )
+
     # train the models
     # COMPUTATIONALLY EXPENSIVE
     for model in models:
+        now = time.time()
         cfg = GPTConfiguration(
             n_layer = 5,
             n_head = 5,
             n_embed = 320,
+            eval_iters = 50,
+            eval_interval = 50, 
+            max_iters = 7600 + 2500, # starts at the last checkpoint from previous
+            save_checkpoints = False,
+
             init_from = "resume",
             lr = 1e-3 if model == "char" else 1e-4,
             dataset = f"shakespeare_{model}",
@@ -46,6 +72,14 @@ if __name__ == "__main__":
         )
 
         # and copy the best model to that
+        os.makedirs(
+            os.path.join(
+                nanopath,
+                f"out-shakespeare-{cfg.name}"
+            ),
+            exist_ok = True
+        )
+
         shutil.copy(
             src = os.path.join(
                 os.path.dirname(__file__),
@@ -73,7 +107,7 @@ if __name__ == "__main__":
                 [
                     sys.executable,
                     "-m",
-                    "train",
+                    "train_sft",
                     os.path.join(
                         os.path.dirname(__file__),
                         "nanoGPT",
@@ -96,3 +130,4 @@ if __name__ == "__main__":
             model = model,
             device = device
         )
+        print(f"Done with model {model}! Took only like {time.time()-now}s")
